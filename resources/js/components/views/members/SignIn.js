@@ -8,7 +8,7 @@ import {
     CardContent,
     CardHeader,
 } from "@material-ui/core";
-import { Box, Container, Grid, Stack } from "@mui/material";
+import { Box, Container, Grid, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
     FaUserAlt,
@@ -83,7 +83,7 @@ const Signin = (props) => {
     // const { setUser } = userAuth();
     // const { user } = userAuth();
     const [isLoading, setIsLoading] = useState(true);
-
+    //response
     const isDesktop = useMediaQuery({
         query: "(min-width: 1224px)",
     });
@@ -92,8 +92,9 @@ const Signin = (props) => {
     });
     const isTablet = useMediaQuery({ query: "(min-width: 768px)" });
     const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
-
-    const [user, setUser] = useState(props.users);
+    //setState
+    const [user, setUser] = useState(props.user);
+    const [alert, setAlert] = useState(false);
 
     const [username, setUserName] = useState("");
     const [password, setPasswd] = useState("");
@@ -103,9 +104,6 @@ const Signin = (props) => {
         "access_token",
         "user",
     ]);
-
-    const [alert, setAlert] = useState(false);
-
     const handleShowPasswd = () => {
         setShowpass(true);
     };
@@ -122,7 +120,7 @@ const Signin = (props) => {
         setTimeout(() => {
             setIsLoading(false);
         }, 1000);
-    }, []);
+    });
     const HandleAuth = async (e) => {
         if (e) {
             e.preventDefault();
@@ -214,7 +212,7 @@ const Signin = (props) => {
         });
         setUser(user);
 
-        props.storeUser(user);
+        storeUser(user);
         setTimeout(() => {
             return history("/");
         }, 2000);
@@ -299,6 +297,14 @@ const Signin = (props) => {
                                             setPasswd(e.target.value)
                                         }
                                     />
+                                    <Button
+                                        type="submit"
+                                        className={`fadeIn third`}
+                                        startIcon={<FaSignInAlt />}
+                                        onClick={(e) => HandleAuth(e)}
+                                    >
+                                        Sign in
+                                    </Button>
                                 </Stack>
                             </Grid>
                             <Grid item xs={4}></Grid>
@@ -306,14 +312,7 @@ const Signin = (props) => {
                     </CardContent>
                     <CardActions>
                         <Stack spacing={1} className={classes.bottom_nav}>
-                            <Button
-                                type="submit"
-                                className={`fadeIn third`}
-                                startIcon={<FaSignInAlt />}
-                                onClick={(e) => HandleAuth(e)}
-                            >
-                                Sign in
-                            </Button>
+                            <Typography>If you don't have Account ?</Typography>
                             <Button
                                 className={`fadeIn fourth`}
                                 startIcon={<FaUserPlus />}

@@ -7,6 +7,8 @@ import {
 } from "react-icons/fa";
 import Signin from "../views/members/SignIn";
 import SignOut from "../views/members/SignOut";
+import SignUp from "../views/members/SignUp";
+
 const AuthRoute = [
     {
         name: "Sign In",
@@ -20,6 +22,7 @@ const AuthRoute = [
         icon: <FaSignInAlt />,
         path: "signup",
         protected: false,
+        component: <SignUp />,
     },
     {
         name: "Sign Out",
