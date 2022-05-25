@@ -226,14 +226,14 @@ const MiniDrawer = (props) => {
                                               <ListItemIcon>
                                                   {route.icon}
                                               </ListItemIcon>
-                                              <Link
+                                              <NavLink
                                                   to={route.path}
                                                   className={classes.urlAuth}
                                               >
                                                   <ListItemText>
                                                       {route.name}
                                                   </ListItemText>
-                                              </Link>
+                                              </NavLink>
                                           </MenuItem>
                                       );
                                   }
@@ -245,14 +245,14 @@ const MiniDrawer = (props) => {
                                               <ListItemIcon>
                                                   {route.icon}
                                               </ListItemIcon>
-                                              <Link
+                                              <NavLink
                                                   to={route.path}
                                                   className={classes.urlAuth}
                                               >
                                                   <ListItemText>
                                                       {route.name}
                                                   </ListItemText>
-                                              </Link>
+                                              </NavLink>
                                           </MenuItem>
                                       );
                                   }

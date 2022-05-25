@@ -34,11 +34,7 @@ const useStyles = makeStyles((theme) => {
     return {
         wrapper: {
             width: 400,
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginTop: "15%",
-            marginBottom: "auto",
-
+            margin: "15% auto auto auto",
             padding: "3%",
             border: "1px solid",
             borderRadius: "5px",
@@ -46,10 +42,7 @@ const useStyles = makeStyles((theme) => {
         },
         wrapper_medium: {
             width: 300,
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginTop: "40%",
-            marginBottom: "auto",
+            margin: "10% auto auto auto",
 
             padding: "3%",
             border: "1px solid",
@@ -70,8 +63,15 @@ const useStyles = makeStyles((theme) => {
             marginTop: "10%",
             padding: "10%",
         },
+        error: {
+            color: "red",
+            border: "1px solid red",
+            borderRadius: "5px",
+            backgroundColor: "#f3f3f3",
+        },
     };
 });
+
 const SignUp = (props) => {
     const classes = useStyles();
     const history = useNavigate();
@@ -92,29 +92,160 @@ const SignUp = (props) => {
         "user",
     ]);
     const [alert, setAlert] = useState(false);
-    const [username, setUserName] = useState("");
-    const [fullname, setFullname] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPasswd] = useState("");
-    const [re_password, setRePasswd] = useState("");
 
+    const [values, setValues] = useState({
+        username: "",
+        fullname: "",
+        email: "",
+        password: "",
+        passwordconf: "",
+    });
     const [showpasswd, setShowpass] = useState(false);
 
+    const [typeInput, setTypeInput] = useState("password");
+
+    const [error, setError] = useState(false);
+
+    //method
     const handleShowPasswd = () => {
         setShowpass(true);
     };
     const handleHidePasswd = () => {
         setShowpass(false);
     };
-    const [typeInput, setTypeInput] = useState("password");
+    const TimeOut = (props) => {};
+    const onChange = async (e) => {
+        // e.preventDefault();
+        await setValues({ ...values, [e.target.name]: e.target.value });
+        !values.username
+            ? setError("Username Required")
+            : !values.fullname
+            ? setError("Full Name Required")
+            : !values.email
+            ? setError("Email Required")
+            : !values.password
+            ? setError("Password Required")
+            : !values.passwordconf
+            ? setError("Confirm Password")
+            : values.password !== values.passwordconf
+            ? setError("Password not math")
+            : setError(false);
+    };
+    const HandleSignUp = async (e) => {
+        e.preventDefault();
+        !values.username
+            ? setError("Username Required")
+            : !values.fullname
+            ? setError("Full Name Required")
+            : !values.email
+            ? setError("Email Required")
+            : !values.password
+            ? setError("Password Required")
+            : !values.passwordconf
+            ? setError("Confirm Password")
+            : values.password !== values.passwordconf
+            ? setError("Password not math")
+            : setError(false);
+    };
+    const input = [
+        {
+            name: "username",
+            type: "text",
+            label: "User Name",
+            placeholder: "Enter UserName",
+            iconStart: (
+                <FaUserAlt
+                    sx={{
+                        color: "green",
+                        fontSize: 20,
+                    }}
+                />
+            ),
+            iconEnd: null,
+            error: "UserName Require",
+        },
+        {
+            name: "fullname",
+            type: "text",
+            label: "Full Name",
+            placeholder: "Enter Full Name",
+            iconStart: (
+                <FaUserAlt
+                    sx={{
+                        color: "green",
+                        fontSize: 20,
+                    }}
+                />
+            ),
+            iconEnd: null,
+            handleFunc: null,
+        },
+        {
+            name: "email",
+            type: "email",
+            label: "Email",
+            placeholder: "Enter Email",
+            iconStart: (
+                <FaInbox
+                    sx={{
+                        color: "green",
+                        fontSize: 20,
+                    }}
+                />
+            ),
+            iconEnd: null,
+            handleFunc: null,
+        },
+        {
+            name: "password",
+            type: typeInput,
+            label: "Password",
+            placeholder: "Enter Password",
+            iconStart: (
+                <FaInbox
+                    sx={{
+                        color: "green",
+                        fontSize: 20,
+                    }}
+                />
+            ),
+
+            iconEnd: showpasswd ? <FaEyeSlash /> : <FaEye />,
+            handleFunc: showpasswd ? handleHidePasswd : handleShowPasswd,
+        },
+        {
+            name: "passwordconf",
+            type: typeInput,
+            label: "Confirm Password",
+            placeholder: "Confirm Password",
+            iconStart: (
+                <FaInbox
+                    sx={{
+                        color: "green",
+                        fontSize: 20,
+                    }}
+                />
+            ),
+            iconEnd: null,
+            handleFunc: null,
+        },
+    ];
+
     useEffect(() => {
+        // password !== "" && passwordConf !== "" ? checkPassConf() : null;
         showpasswd ? setTypeInput("text") : setTypeInput("password");
-        setTimeout(() => {
+
+        let timerAlert = setTimeout(() => {
             setAlert(null);
         }, 7000);
-        setTimeout(() => {
+        let timerLoading = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
+
+        return () => {
+            clearTimeout(timerAlert);
+            clearTimeout(timerLoading);
+        };
     });
     return (
         <Container>
@@ -152,89 +283,43 @@ const SignUp = (props) => {
                         <Grid columns={1}>
                             <Grid item xs={4}>
                                 <Stack spacing={2} className={`fadeIn first`}>
-                                    <InputCustom
-                                        label="UserName"
-                                        placeholder="Enter UserName"
-                                        iconStart={
-                                            <FaUserAlt
-                                                sx={{
-                                                    color: "green",
-                                                    fontSize: 20,
-                                                }}
-                                            />
-                                        }
-                                        onChange={(e) =>
-                                            setUserName(e.target.value)
-                                        }
-                                    />
-                                    <InputCustom
-                                        label="Email"
-                                        placeholder="Enter Email"
-                                        iconStart={
-                                            <FaInbox
-                                                sx={{
-                                                    color: "green",
-                                                    fontSize: 20,
-                                                }}
-                                            />
-                                        }
-                                        onChange={(e) =>
-                                            setEmail(e.target.value)
-                                        }
-                                    />
-                                    <InputCustom
-                                        className={`fadeIn second`}
-                                        label="PassWord"
-                                        type={typeInput}
-                                        placeholder="Enter Password"
-                                        handleFunc={
-                                            showpasswd
-                                                ? handleHidePasswd
-                                                : handleShowPasswd
-                                        }
-                                        iconStart={
-                                            <FaLock
-                                                sx={{
-                                                    color: "green",
-                                                    fontSize: 20,
-                                                }}
-                                            />
-                                        }
-                                        iconEnd={
-                                            showpasswd ? (
-                                                <FaEyeSlash />
-                                            ) : (
-                                                <FaEye />
-                                            )
-                                        }
-                                        onChange={(e) =>
-                                            setPasswd(e.target.value)
-                                        }
-                                    />
-                                    <InputCustom
-                                        className={`fadeIn second`}
-                                        label="ConfirmPassWord"
-                                        type={typeInput}
-                                        placeholder="Enter password to confirm"
-                                        iconStart={
-                                            <FaLock
-                                                sx={{
-                                                    color: "green",
-                                                    fontSize: 20,
-                                                }}
-                                            />
-                                        }
-                                        onChange={(e) =>
-                                            setPasswd(e.target.value)
-                                        }
-                                    />
+                                    {error ? (
+                                        <Typography className={classes.error}>
+                                            {error}
+                                        </Typography>
+                                    ) : null}
+                                    {input.map((input, key) => (
+                                        <InputCustom
+                                            key={key}
+                                            name={input.name}
+                                            type={input.type}
+                                            className={`fadeIn ${
+                                                key === 0
+                                                    ? "first"
+                                                    : key === 1
+                                                    ? "second"
+                                                    : key === 2
+                                                    ? "third"
+                                                    : key === 3
+                                                    ? "fourth"
+                                                    : ""
+                                            }`}
+                                            label={input.label}
+                                            placeholder={input.placeholder}
+                                            iconStart={input.iconStart}
+                                            iconEnd={input.iconEnd}
+                                            handleFunc={input.handleFunc}
+                                            onChange={onChange}
+                                        />
+                                    ))}
+
                                     <Button
                                         type="submit"
                                         className={`fadeIn third`}
                                         startIcon={<FaSignInAlt />}
-                                        onClick={(e) => HandleAuth(e)}
+                                        onClick={(e) => HandleSignUp(e)}
                                     >
-                                        Sign in
+                                        Sign Up
                                     </Button>
                                 </Stack>
                             </Grid>
@@ -243,27 +328,25 @@ const SignUp = (props) => {
                     </CardContent>
                     <CardActions>
                         <Stack spacing={1} className={classes.bottom_nav}>
-                            <Stack spacing={1} className={classes.bottom_nav}>
-                                <Typography>If you have Account ?</Typography>
-                                <Button
-                                    className={`fadeIn fourth`}
-                                    startIcon={<FaSignInAlt />}
-                                    onClick={() => {
-                                        history("/signin");
-                                    }}
-                                >
-                                    Sign In
-                                </Button>
-                                <Button
-                                    className={`fadeIn five`}
-                                    startIcon={<FaHome />}
-                                    onClick={() => {
-                                        history("/");
-                                    }}
-                                >
-                                    To Home
-                                </Button>
-                            </Stack>
+                            <Typography>If you have Account ?</Typography>
+                            <Button
+                                className={`fadeIn fourth`}
+                                startIcon={<FaSignInAlt />}
+                                onClick={() => {
+                                    history("/signin");
+                                }}
+                            >
+                                Sign In
+                            </Button>
+                            <Button
+                                className={`fadeIn five`}
+                                startIcon={<FaHome />}
+                                onClick={() => {
+                                    history("/");
+                                }}
+                            >
+                                To Home
+                            </Button>
                         </Stack>
                     </CardActions>
                 </Card>

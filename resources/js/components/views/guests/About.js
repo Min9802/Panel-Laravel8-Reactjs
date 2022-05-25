@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 
 import { FaInfo } from "react-icons/fa";
 
 const About = (props) => {
+    const [isLoading, setIsLoading] = useState(true);
     const alert_show = {
         icon: <FaInfo />,
         alert: true,
@@ -20,9 +21,18 @@ const About = (props) => {
     useEffect(() => {
         props.handle.setAlert(alert_show);
         props.handle.setCardInfo(cardInfo);
-        setTimeout(() => {
-            props.handle.setAlert(false);
+
+        let timerAlert = setTimeout(() => {
+            props.handle.setAlert(null);
         }, 7000);
+        let timerLoading = setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+
+        return () => {
+            clearTimeout(timerAlert);
+            clearTimeout(timerLoading);
+        };
     }, []);
 
     return (

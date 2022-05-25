@@ -20,7 +20,6 @@ const useStyles = makeStyles((theme) => {
 const Bio = (props) => {
     const classes = useStyles();
 
-    const [btnTrans, setBtntrans] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [Alert, setUpdateAlert] = useState(false);
     const [card, setUpdateCard] = useState(false);
@@ -42,24 +41,23 @@ const Bio = (props) => {
         avatar: null,
     };
     useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 1500);
-
-        setTimeout(() => {
-            setBtntrans(true);
-        }, 1500);
         props.handle.setAlert(alert_show);
         props.handle.setCardInfo(cardInfo);
-        setTimeout(() => {
+
+        let timerAlert = setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+        let timerLoading = setTimeout(() => {
             props.handle.setAlert(false);
         }, 7000);
-        return () => {};
+        return () => {
+            clearTimeout(timerAlert);
+            clearTimeout(timerLoading);
+        };
     }, []);
     return (
         <ButtonBio
             classes={classes.Button_bio}
-            btnTrans={btnTrans}
             isLoading={isLoading}
             routes={BioRoute}
             className={classes.Button_bio}

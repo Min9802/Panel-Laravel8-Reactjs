@@ -114,13 +114,19 @@ const Signin = (props) => {
 
     useEffect(() => {
         showpasswd ? setTypeInput("text") : setTypeInput("password");
-        setTimeout(() => {
+
+        let timerAlert = setTimeout(() => {
             setAlert(null);
         }, 7000);
-        setTimeout(() => {
+        let timerLoading = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
-    });
+
+        return () => {
+            clearTimeout(timerAlert);
+            clearTimeout(timerLoading);
+        };
+    }, []);
     const HandleAuth = async (e) => {
         if (e) {
             e.preventDefault();
