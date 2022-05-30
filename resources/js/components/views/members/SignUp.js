@@ -29,12 +29,16 @@ import CardLoading from "../../components/isLoading/CardLoading";
 import AlertMsg from "../../components/customs/AlertMsg";
 import { useCookies } from "react-cookie";
 import InputCustom from "../../components/customs/InputCustom";
+//API_Auth
+import AuthAPI from "../../apis/AuthApi";
+import { FormattedMessage, useIntl } from "react-intl";
+import { KeyCodeUtils } from "../../utils";
 
 const useStyles = makeStyles((theme) => {
     return {
         wrapper: {
             width: 400,
-            margin: "15% auto auto auto",
+            margin: "10% auto auto auto",
             padding: "3%",
             border: "1px solid",
             borderRadius: "5px",
@@ -75,7 +79,7 @@ const useStyles = makeStyles((theme) => {
 const SignUp = (props) => {
     const classes = useStyles();
     const history = useNavigate();
-
+    const intl = useIntl();
     //response
     const isDesktop = useMediaQuery({
         query: "(min-width: 1224px)",
@@ -91,20 +95,29 @@ const SignUp = (props) => {
         "access_token",
         "user",
     ]);
-    const [alert, setAlert] = useState(false);
-
-    const [values, setValues] = useState({
-        username: "",
-        fullname: "",
-        email: "",
-        password: "",
-        passwordconf: "",
-    });
+    const handlerKeyDown = (event) => {
+        const keyCode = event.which || event.keyCode;
+        if (keyCode === KeyCodeUtils.ENTER) {
+            event.preventDefault();
+            HandleSignUp(event);
+        }
+    };
     const [showpasswd, setShowpass] = useState(false);
 
     const [typeInput, setTypeInput] = useState("password");
 
+    const [alert, setAlert] = useState(false);
     const [error, setError] = useState(false);
+    const initValues = {
+        username: "",
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+    };
+    const [formValues, setFormValues] = useState(initValues);
+
+    const [formErrs, setFormErrs] = useState(false);
 
     //method
     const handleShowPasswd = () => {
@@ -113,46 +126,45 @@ const SignUp = (props) => {
     const handleHidePasswd = () => {
         setShowpass(false);
     };
-    const TimeOut = (props) => {};
     const onChange = async (e) => {
         // e.preventDefault();
-        await setValues({ ...values, [e.target.name]: e.target.value });
-        !values.username
-            ? setError("Username Required")
-            : !values.fullname
-            ? setError("Full Name Required")
-            : !values.email
-            ? setError("Email Required")
-            : !values.password
-            ? setError("Password Required")
-            : !values.passwordconf
-            ? setError("Confirm Password")
-            : values.password !== values.passwordconf
-            ? setError("Password not math")
-            : setError(false);
+        const { name, value } = e.target;
+        await setFormValues({ ...formValues, [name]: value });
+    };
+    const validate = () => {
+        !formValues.username
+            ? setFormErrs({ username: "Username Required" })
+            : !formValues.name
+            ? setFormErrs({ name: "Name Required" })
+            : !formValues.email
+            ? setFormErrs({ email: "Email Required" })
+            : !formValues.password
+            ? setFormErrs({ password: "Password Required" })
+            : !formValues.password_confirmation
+            ? setFormErrs({ password_confirmation: "Confirm Password" })
+            : formValues.password !== formValues.password_confirmation
+            ? setFormErrs({ password_confirmation: "Password not match" })
+            : setFormErrs(false);
     };
     const HandleSignUp = async (e) => {
         e.preventDefault();
-        !values.username
-            ? setError("Username Required")
-            : !values.fullname
-            ? setError("Full Name Required")
-            : !values.email
-            ? setError("Email Required")
-            : !values.password
-            ? setError("Password Required")
-            : !values.passwordconf
-            ? setError("Confirm Password")
-            : values.password !== values.passwordconf
-            ? setError("Password not math")
-            : setError(false);
+        validate();
+        try {
+            let response = await AuthAPI.Register(formValues);
+        } catch (err) {
+            let errRes = err.response.data.message;
+            setFormErrs({
+                username: errRes.username,
+                name: errRes.name,
+                email: errRes.email,
+                password: errRes.password,
+            });
+        }
     };
     const input = [
         {
             name: "username",
             type: "text",
-            label: "User Name",
-            placeholder: "Enter UserName",
             iconStart: (
                 <FaUserAlt
                     sx={{
@@ -163,12 +175,11 @@ const SignUp = (props) => {
             ),
             iconEnd: null,
             error: "UserName Require",
+            err: formErrs["username"],
         },
         {
-            name: "fullname",
+            name: "name",
             type: "text",
-            label: "Full Name",
-            placeholder: "Enter Full Name",
             iconStart: (
                 <FaUserAlt
                     sx={{
@@ -179,12 +190,11 @@ const SignUp = (props) => {
             ),
             iconEnd: null,
             handleFunc: null,
+            err: formErrs["name"],
         },
         {
             name: "email",
             type: "email",
-            label: "Email",
-            placeholder: "Enter Email",
             iconStart: (
                 <FaInbox
                     sx={{
@@ -195,14 +205,13 @@ const SignUp = (props) => {
             ),
             iconEnd: null,
             handleFunc: null,
+            err: formErrs["email"],
         },
         {
             name: "password",
             type: typeInput,
-            label: "Password",
-            placeholder: "Enter Password",
             iconStart: (
-                <FaInbox
+                <FaLock
                     sx={{
                         color: "green",
                         fontSize: 20,
@@ -212,14 +221,13 @@ const SignUp = (props) => {
 
             iconEnd: showpasswd ? <FaEyeSlash /> : <FaEye />,
             handleFunc: showpasswd ? handleHidePasswd : handleShowPasswd,
+            err: formErrs["password"],
         },
         {
-            name: "passwordconf",
+            name: "password_confirmation",
             type: typeInput,
-            label: "Confirm Password",
-            placeholder: "Confirm Password",
             iconStart: (
-                <FaInbox
+                <FaLock
                     sx={{
                         color: "green",
                         fontSize: 20,
@@ -228,13 +236,13 @@ const SignUp = (props) => {
             ),
             iconEnd: null,
             handleFunc: null,
+            err: formErrs["password_confirmation"],
         },
     ];
-
     useEffect(() => {
         // password !== "" && passwordConf !== "" ? checkPassConf() : null;
         showpasswd ? setTypeInput("text") : setTypeInput("password");
-
+        document.addEventListener("keydown", handlerKeyDown);
         let timerAlert = setTimeout(() => {
             setAlert(null);
         }, 7000);
@@ -246,7 +254,7 @@ const SignUp = (props) => {
             clearTimeout(timerAlert);
             clearTimeout(timerLoading);
         };
-    });
+    }, [showpasswd, formErrs]);
     return (
         <Container>
             {isLoading ? (
@@ -263,11 +271,6 @@ const SignUp = (props) => {
                             : classes.wrapper
                     }
                 >
-                    <CardHeader
-                        avatar={<Avatar src={Logo}></Avatar>}
-                        title="Sign Up"
-                        className={classes.header_card}
-                    ></CardHeader>
                     {alert ? (
                         <AlertMsg
                             icon={alert.icon}
@@ -279,38 +282,64 @@ const SignUp = (props) => {
                             text={alert.text}
                         />
                     ) : null}
+                    <CardHeader
+                        avatar={<Avatar src={Logo}></Avatar>}
+                        title={<FormattedMessage id={"form.signup.title"} />}
+                        className={classes.header_card}
+                    ></CardHeader>
                     <CardContent>
                         <Grid columns={1}>
                             <Grid item xs={4}>
                                 <Stack spacing={2} className={`fadeIn first`}>
-                                    {error ? (
-                                        <Typography className={classes.error}>
-                                            {error}
-                                        </Typography>
-                                    ) : null}
                                     {input.map((input, key) => (
-                                        <InputCustom
+                                        <Stack
                                             key={key}
-                                            name={input.name}
-                                            type={input.type}
-                                            className={`fadeIn ${
-                                                key === 0
-                                                    ? "first"
-                                                    : key === 1
-                                                    ? "second"
-                                                    : key === 2
-                                                    ? "third"
-                                                    : key === 3
-                                                    ? "fourth"
-                                                    : ""
-                                            }`}
-                                            label={input.label}
-                                            placeholder={input.placeholder}
-                                            iconStart={input.iconStart}
-                                            iconEnd={input.iconEnd}
-                                            handleFunc={input.handleFunc}
-                                            onChange={onChange}
-                                        />
+                                            spacing={2}
+                                            className={`fadeIn first`}
+                                        >
+                                            <InputCustom
+                                                name={input.name}
+                                                type={input.type}
+                                                className={`fadeIn ${
+                                                    key === 0
+                                                        ? "first"
+                                                        : key === 1
+                                                        ? "second"
+                                                        : key === 2
+                                                        ? "third"
+                                                        : key === 3
+                                                        ? "fourth"
+                                                        : ""
+                                                }`}
+                                                value={formValues[input.name]}
+                                                label={
+                                                    <FormattedMessage
+                                                        id={
+                                                            "form.signup." +
+                                                            input.name
+                                                        }
+                                                    />
+                                                }
+                                                placeholder={intl.formatMessage(
+                                                    {
+                                                        id:
+                                                            "form.placeholder." +
+                                                            input.name,
+                                                    }
+                                                )}
+                                                iconStart={input.iconStart}
+                                                iconEnd={input.iconEnd}
+                                                handleFunc={input.handleFunc}
+                                                onChange={onChange}
+                                            />
+                                            {formErrs[input.name] ? (
+                                                <Typography
+                                                    className={classes.error}
+                                                >
+                                                    {formErrs[input.name]}
+                                                </Typography>
+                                            ) : null}
+                                        </Stack>
                                     ))}
 
                                     <Button
@@ -319,7 +348,9 @@ const SignUp = (props) => {
                                         startIcon={<FaSignInAlt />}
                                         onClick={(e) => HandleSignUp(e)}
                                     >
-                                        Sign Up
+                                        <FormattedMessage
+                                            id={"common.signup"}
+                                        />
                                     </Button>
                                 </Stack>
                             </Grid>
@@ -328,7 +359,9 @@ const SignUp = (props) => {
                     </CardContent>
                     <CardActions>
                         <Stack spacing={1} className={classes.bottom_nav}>
-                            <Typography>If you have Account ?</Typography>
+                            <Typography>
+                                <FormattedMessage id={"form.signin.ask"} />
+                            </Typography>
                             <Button
                                 className={`fadeIn fourth`}
                                 startIcon={<FaSignInAlt />}
@@ -336,7 +369,7 @@ const SignUp = (props) => {
                                     history("/signin");
                                 }}
                             >
-                                Sign In
+                                <FormattedMessage id={"common.signin"} />
                             </Button>
                             <Button
                                 className={`fadeIn five`}
@@ -345,7 +378,9 @@ const SignUp = (props) => {
                                     history("/");
                                 }}
                             >
-                                To Home
+                                <FormattedMessage
+                                    id={"menu.guest.sidebar.Home"}
+                                />
                             </Button>
                         </Stack>
                     </CardActions>

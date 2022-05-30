@@ -30,10 +30,13 @@ import { connect } from "react-redux";
 
 import Logo from "../../assets/images/logo192.png";
 import CardLoading from "../../components/isLoading/CardLoading";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import { useCookies } from "react-cookie";
 //API_Auth
 import AuthAPI from "../../apis/AuthApi";
+import actions from "../../store/actions/actionTypes";
+import { KeyCodeUtils } from "../../utils";
 
 const useStyles = makeStyles((theme) => {
     return {
@@ -80,6 +83,8 @@ const useStyles = makeStyles((theme) => {
 const Signin = (props) => {
     const classes = useStyles();
     const history = useNavigate();
+    const intl = useIntl();
+
     // const { setUser } = userAuth();
     // const { user } = userAuth();
     const [isLoading, setIsLoading] = useState(true);
@@ -96,14 +101,30 @@ const Signin = (props) => {
     const [user, setUser] = useState(props.user);
     const [alert, setAlert] = useState(false);
 
-    const [username, setUserName] = useState("");
-    const [password, setPasswd] = useState("");
+    const initValues = {
+        username: "",
+        password: "",
+    };
+    const [formValues, setFormValues] = useState(initValues);
+
     const [showpasswd, setShowpass] = useState(false);
 
+    const [formErrs, setFormErrs] = useState(false);
     const [cookies, setCookie, removeCookie] = useCookies([
         "access_token",
         "user",
     ]);
+    const handlerKeyDown = (event) => {
+        const keyCode = event.which || event.keyCode;
+        if (keyCode === KeyCodeUtils.ENTER) {
+            event.preventDefault();
+            HandleAuth(event);
+        }
+    };
+    const onChange = async (e) => {
+        const { name, value } = e.target;
+        await setFormValues({ ...formValues, [name]: value });
+    };
     const handleShowPasswd = () => {
         setShowpass(true);
     };
@@ -111,10 +132,43 @@ const Signin = (props) => {
         setShowpass(false);
     };
     const [typeInput, setTypeInput] = useState("password");
+    const { userLoginSuccess, userLoginFail } = props;
+    const input = [
+        {
+            name: "username",
+            type: "text",
+            iconStart: (
+                <FaUserAlt
+                    sx={{
+                        color: "green",
+                        fontSize: 20,
+                    }}
+                />
+            ),
+            iconEnd: null,
+            error: "UserName Require",
+            err: formErrs["username"],
+        },
+        {
+            name: "password",
+            type: typeInput,
+            iconStart: (
+                <FaLock
+                    sx={{
+                        color: "green",
+                        fontSize: 20,
+                    }}
+                />
+            ),
 
+            iconEnd: showpasswd ? <FaEyeSlash /> : <FaEye />,
+            handleFunc: showpasswd ? handleHidePasswd : handleShowPasswd,
+            err: formErrs["password"],
+        },
+    ];
     useEffect(() => {
         showpasswd ? setTypeInput("text") : setTypeInput("password");
-
+        document.addEventListener("keydown", handlerKeyDown);
         let timerAlert = setTimeout(() => {
             setAlert(null);
         }, 7000);
@@ -126,7 +180,7 @@ const Signin = (props) => {
             clearTimeout(timerAlert);
             clearTimeout(timerLoading);
         };
-    }, []);
+    }, [showpasswd, formValues]);
     const HandleAuth = async (e) => {
         if (e) {
             e.preventDefault();
@@ -134,7 +188,7 @@ const Signin = (props) => {
         if (user && user.token) {
             return history("/");
         }
-        if (username === "") {
+        if (formValues.username === "") {
             const alert_show = {
                 icon: <Error />,
                 alert: true,
@@ -146,7 +200,7 @@ const Signin = (props) => {
             };
             setAlert(alert_show);
         }
-        if (password === "") {
+        if (formValues.password === "") {
             const alert_show = {
                 icon: <Error />,
                 alert: true,
@@ -159,10 +213,7 @@ const Signin = (props) => {
             setAlert(alert_show);
         }
         try {
-            let response = await AuthAPI.Login({
-                username,
-                password,
-            });
+            let response = await AuthAPI.Login(formValues);
             if (response.data.error) {
                 const alert_show = {
                     icon: <Error />,
@@ -218,7 +269,8 @@ const Signin = (props) => {
         });
         setUser(user);
 
-        storeUser(user);
+        // userLoginSuccess(user);
+        console.log(userLoginSuccess);
         setTimeout(() => {
             return history("/");
         }, 2000);
@@ -239,11 +291,6 @@ const Signin = (props) => {
                             : classes.wrapper
                     }
                 >
-                    <CardHeader
-                        avatar={<Avatar src={Logo}></Avatar>}
-                        title="Sign in"
-                        className={classes.header_card}
-                    ></CardHeader>
                     {alert ? (
                         <AlertMsg
                             icon={alert.icon}
@@ -255,61 +302,74 @@ const Signin = (props) => {
                             text={alert.text}
                         />
                     ) : null}
+                    <CardHeader
+                        avatar={<Avatar src={Logo}></Avatar>}
+                        title={<FormattedMessage id={"form.signin.title"} />}
+                        className={classes.header_card}
+                    ></CardHeader>
                     <CardContent>
                         <Grid columns={1}>
                             <Grid item xs={4}>
                                 <Stack spacing={2} className={`fadeIn first`}>
-                                    <InputCustom
-                                        label="UserName"
-                                        placeholder="Enter UserName"
-                                        iconStart={
-                                            <FaUserAlt
-                                                sx={{
-                                                    color: "green",
-                                                    fontSize: 20,
-                                                }}
+                                    {input.map((input, key) => (
+                                        <Stack
+                                            key={key}
+                                            spacing={2}
+                                            className={`fadeIn first`}
+                                        >
+                                            <InputCustom
+                                                name={input.name}
+                                                type={input.type}
+                                                className={`fadeIn ${
+                                                    key === 0
+                                                        ? "first"
+                                                        : key === 1
+                                                        ? "second"
+                                                        : key === 2
+                                                        ? "third"
+                                                        : key === 3
+                                                        ? "fourth"
+                                                        : ""
+                                                }`}
+                                                value={formValues[input.name]}
+                                                label={
+                                                    <FormattedMessage
+                                                        id={
+                                                            "form.signin." +
+                                                            input.name
+                                                        }
+                                                    />
+                                                }
+                                                placeholder={intl.formatMessage(
+                                                    {
+                                                        id:
+                                                            "form.placeholder." +
+                                                            input.name,
+                                                    }
+                                                )}
+                                                iconStart={input.iconStart}
+                                                iconEnd={input.iconEnd}
+                                                handleFunc={input.handleFunc}
+                                                onChange={onChange}
                                             />
-                                        }
-                                        onChange={(e) =>
-                                            setUserName(e.target.value)
-                                        }
-                                    />
-                                    <InputCustom
-                                        className={`fadeIn second`}
-                                        label="PassWord"
-                                        type={typeInput}
-                                        placeholder="Enter Password"
-                                        handleFunc={
-                                            showpasswd
-                                                ? handleHidePasswd
-                                                : handleShowPasswd
-                                        }
-                                        iconStart={
-                                            <FaLock
-                                                sx={{
-                                                    color: "green",
-                                                    fontSize: 20,
-                                                }}
-                                            />
-                                        }
-                                        iconEnd={
-                                            showpasswd ? (
-                                                <FaEyeSlash />
-                                            ) : (
-                                                <FaEye />
-                                            )
-                                        }
-                                        onChange={(e) =>
-                                            setPasswd(e.target.value)
-                                        }
-                                    />
+                                            {formErrs[input.name] ? (
+                                                <Typography
+                                                    className={classes.error}
+                                                >
+                                                    {formErrs[input.name]}
+                                                </Typography>
+                                            ) : null}
+                                        </Stack>
+                                    ))}
                                     <Button
                                         type="submit"
                                         className={`fadeIn third`}
                                         startIcon={<FaSignInAlt />}
                                         onClick={(e) => HandleAuth(e)}
                                     >
-                                        Sign in
+                                        <FormattedMessage
+                                            id={"common.signin"}
+                                        />
                                     </Button>
                                 </Stack>
                             </Grid>
@@ -318,7 +378,9 @@ const Signin = (props) => {
                     </CardContent>
                     <CardActions>
                         <Stack spacing={1} className={classes.bottom_nav}>
-                            <Typography>If you don't have Account ?</Typography>
+                            <Typography>
+                                <FormattedMessage id={"form.signin.ask"} />
+                            </Typography>
                             <Button
                                 className={`fadeIn fourth`}
                                 startIcon={<FaUserPlus />}
@@ -326,7 +388,7 @@ const Signin = (props) => {
                                     history("/signup");
                                 }}
                             >
-                                Sign Up
+                                <FormattedMessage id={"menu.member.signup"} />
                             </Button>
                             <Button
                                 className={`fadeIn five`}
@@ -335,7 +397,9 @@ const Signin = (props) => {
                                     history("/");
                                 }}
                             >
-                                To Home
+                                <FormattedMessage
+                                    id={"menu.guest.sidebar.Home"}
+                                />
                             </Button>
                         </Stack>
                     </CardActions>
@@ -346,16 +410,14 @@ const Signin = (props) => {
 };
 const mapStateToProps = (state) => {
     return {
-        user: state.user,
+        user: state.userInfo,
+        language: state.app.language,
     };
 };
 const mapDispatchToProps = (dispatch) => {
     return {
-        storeUser: (user) =>
-            dispatch({
-                type: "INFO_USER",
-                payload: user,
-            }),
+        userLoginSuccess: (user) => dispatch(actions.userLoginSuccess(user)),
+        userLoginFail: () => dispatch(actions.userLoginFail()),
     };
 };
 

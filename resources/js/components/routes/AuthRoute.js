@@ -11,37 +11,42 @@ import SignUp from "../views/members/SignUp";
 
 const AuthRoute = [
     {
-        name: "Sign In",
+        name: "signin",
         icon: <FaSignInAlt />,
         path: "/signin",
         component: <Signin />,
         protected: false,
+        hidden: false,
     },
     {
-        name: "Sign Up",
+        name: "signup",
         icon: <FaSignInAlt />,
         path: "/signup",
         protected: true,
         component: <SignUp />,
+        hidden: false,
     },
     {
-        name: "Sign Out",
+        name: "signout",
         icon: <FaSignOutAlt />,
         path: "/signout",
         component: <SignOut />,
         protected: true,
+        hidden: true,
     },
     {
-        name: "Profile",
+        name: "profile",
         icon: <FaUserEdit />,
         path: "/profile",
         protected: true,
+        hidden: true,
     },
     {
-        name: "Wallet",
+        name: "wallet",
         icon: <FaWallet />,
         path: "/wallet",
         protected: true,
+        hidden: true,
     },
 ];
 

@@ -6,6 +6,7 @@ class AuthApi {
     };
 
     static Register = (data) => {
+        console.log(data);
         return axios.post(`${base}/register`, data);
     };
 

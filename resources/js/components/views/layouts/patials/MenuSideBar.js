@@ -7,6 +7,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 
 import routes from "../../../routes/sideRoutes";
+import { connect } from "react-redux";
+import { FormattedMessage } from "react-intl";
 
 const useStyles = makeStyles((theme) => ({
     sidenav_navlink: {
@@ -52,7 +54,14 @@ const MenuSideBar = ({ open }) => {
                             </ListItemIcon>
                             <Typography variant="h6" noWrap component="div">
                                 <ListItemText
-                                    secondary={route.name}
+                                    secondary={
+                                        <FormattedMessage
+                                            id={
+                                                "menu.guest.sidebar." +
+                                                [route.name]
+                                            }
+                                        />
+                                    }
                                     sx={{ opacity: open ? 1 : 0 }}
                                     className={classes.textsidebar}
                                 />
@@ -64,5 +73,9 @@ const MenuSideBar = ({ open }) => {
         </>
     );
 };
-
-export default MenuSideBar;
+const mapStateToProps = (state) => {
+    return {
+        language: state.app.language,
+    };
+};
+export default connect(mapStateToProps)(MenuSideBar);

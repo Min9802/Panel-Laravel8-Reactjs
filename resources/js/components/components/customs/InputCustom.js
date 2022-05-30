@@ -12,30 +12,32 @@ import { Button, IconButton } from "@material-ui/core";
  *
  */
 const InputCustom = ({
-  iconStart,
-  handleFunc,
-  iconEnd,
-  InputProps,
-  ...props
+    iconStart,
+    handleFunc,
+    iconEnd,
+    InputProps,
+    ...props
 }) => {
-  return (
-    <TextField
-      {...props}
-      InputProps={{
-        ...InputProps,
-        placeholder: props.placeholder,
-        type: props.type,
-        startAdornment: iconStart ? (
-          <InputAdornment position="start">{iconStart}</InputAdornment>
-        ) : null,
-        endAdornment: iconEnd ? (
-          <IconButton onClick={handleFunc}>
-            <InputAdornment position="end">{iconEnd}</InputAdornment>
-          </IconButton>
-        ) : null,
-      }}
-    />
-  );
+    return (
+        <TextField
+            {...props}
+            InputProps={{
+                ...InputProps,
+                startAdornment: iconStart ? (
+                    <InputAdornment position="start">
+                        {iconStart}
+                    </InputAdornment>
+                ) : null,
+                endAdornment: iconEnd ? (
+                    <IconButton onClick={handleFunc}>
+                        <InputAdornment position="end">
+                            {iconEnd}
+                        </InputAdornment>
+                    </IconButton>
+                ) : null,
+            }}
+        />
+    );
 };
 
 export default InputCustom;

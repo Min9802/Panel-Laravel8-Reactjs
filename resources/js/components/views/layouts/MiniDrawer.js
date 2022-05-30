@@ -9,7 +9,7 @@ import Toolbar from "@mui/material/Toolbar";
 
 import CssBaseline from "@mui/material/CssBaseline";
 
-import { Typography, MenuItem, Menu } from "@mui/material";
+import { Typography, MenuItem, Menu, Avatar } from "@mui/material";
 
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -27,7 +27,10 @@ import { ListItemIcon, ListItemText } from "@material-ui/core";
 import { connect } from "react-redux";
 import { useCookies } from "react-cookie";
 import AuthRoute from "../../routes/AuthRoute";
+import { FormattedMessage } from "react-intl";
 
+import EN from "../../assets/images/lang/EN.png";
+import VI from "../../assets/images/lang/VI.png";
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -121,6 +124,11 @@ const useStyles = makeStyles((theme) => ({
         textTransform: "uppercase",
         paddingRight: 10,
     },
+    lang: {
+        height: 28,
+        width: 28,
+        margin: "auto 5% auto auto",
+    },
 }));
 const MiniDrawer = (props) => {
     const classes = useStyles();
@@ -146,6 +154,9 @@ const MiniDrawer = (props) => {
 
     const handleClose = () => {
         setAnchorEl(null);
+    };
+    const handleChangeLang = () => {
+        console.log(props);
     };
     useEffect(() => {
         if (cookies.user) {
@@ -180,6 +191,18 @@ const MiniDrawer = (props) => {
                             {MIX_APP_NAME}
                         </Typography>
                     </NavLink>
+                    <IconButton
+                        size="large"
+                        color="inherit"
+                        style={{
+                            position: "absolute",
+                            marginRight: 20,
+                            right: 50,
+                        }}
+                        onClick={handleChangeLang}
+                    >
+                        <Avatar src={EN} style={{ height: 28, width: 28 }} />
+                    </IconButton>
                     <IconButton
                         size="large"
                         aria-label="account of current user"
@@ -220,7 +243,7 @@ const MiniDrawer = (props) => {
                     >
                         {auth
                             ? AuthRoute.map((route, key) => {
-                                  if (route.protected) {
+                                  if (route.protected && route.hidden) {
                                       return (
                                           <MenuItem key={key}>
                                               <ListItemIcon>
@@ -231,7 +254,12 @@ const MiniDrawer = (props) => {
                                                   className={classes.urlAuth}
                                               >
                                                   <ListItemText>
-                                                      {route.name}
+                                                      <FormattedMessage
+                                                          id={
+                                                              "menu.member." +
+                                                              route.name
+                                                          }
+                                                      />
                                                   </ListItemText>
                                               </NavLink>
                                           </MenuItem>
@@ -250,7 +278,12 @@ const MiniDrawer = (props) => {
                                                   className={classes.urlAuth}
                                               >
                                                   <ListItemText>
-                                                      {route.name}
+                                                      <FormattedMessage
+                                                          id={
+                                                              "menu.member." +
+                                                              [route.name]
+                                                          }
+                                                      />
                                                   </ListItemText>
                                               </NavLink>
                                           </MenuItem>
@@ -277,7 +310,7 @@ const MiniDrawer = (props) => {
 };
 const mapStateToProps = (state) => {
     return {
-        state: state,
+        language: state.app.language,
     };
 };
 const mapDispatchToProps = (dispatch) => {

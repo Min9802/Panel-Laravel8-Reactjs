@@ -1,20 +1,29 @@
-import React from "react";
-import { useCookies } from "react-cookie";
+import { combineReducers } from "redux";
+// import { connectRouter } from "connected-react-router";
 
-let initState = {};
+import appReducer from "./appReducer";
+import adminReducer from "./adminReducer";
+import userReducer from "./userReducer";
 
-const rootReducer = (state = initState, action) => {
-    switch (action.type) {
-        case "INFO_USER":
-            let userData = action.payload;
-            return {
-                ...state,
-                user: userData,
-            };
-            break;
-        default:
-            return state;
-    }
+import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
+import storage from "redux-persist/lib/storage";
+import { persistReducer } from "redux-persist";
+
+const persistCommonConfig = {
+    storage: storage,
+    stateReconciler: autoMergeLevel2,
 };
 
-export default rootReducer;
+const adminPersistConfig = {
+    ...persistCommonConfig,
+    key: "admin",
+    whitelist: ["isLoggedIn", "adminInfo"],
+};
+
+export default (history) =>
+    combineReducers({
+        // router: connectRouter(history),
+        admin: persistReducer(adminPersistConfig, adminReducer),
+        user: userReducer,
+        app: appReducer,
+    });
