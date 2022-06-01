@@ -6,6 +6,7 @@ use App\Http\Requests\SignupRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -15,9 +16,11 @@ class AuthController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    private $user;
+    public function __construct(User $user)
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->user = $user;
+        $this->middleware('auth:api', ['except' => ['login', 'register','getuser']]);
     }
 
     /**
@@ -50,9 +53,13 @@ class AuthController extends Controller
      */
     public function register(SignupRequest $request)
     {
-        $user = User::create(array_merge(
-            ['password' => bcrypt($request->password)]
-        ));
+        $data = [
+            'username' => $request->username,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ];
+        $user = User::create($data);
 
         return response()->json([
             'message' => 'User successfully registered',
@@ -103,7 +110,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            'expires_in' => auth()->factory()->getTTL() * 12*60,
             'user' => auth()->user(),
         ]);
     }
@@ -128,5 +135,24 @@ class AuthController extends Controller
             'message' => 'User successfully changed password',
             'user' => $user,
         ], 201);
+    }
+    public function getuser(Request $request)
+    {
+        $username = $request->username;
+        $user = $this->user->where('username',$username)->first();
+        if($user){
+            $dataUser = [
+                'username' => $user->username,
+                'name' => $user->name,
+                'email' => $user->email
+            ];
+            return response()->json($dataUser);
+        }else{
+            $data = [
+                'message' => "User Not Found",
+            ];
+            return response()->json($data,403);
+
+        }
     }
 }

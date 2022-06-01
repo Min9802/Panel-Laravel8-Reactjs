@@ -5,9 +5,11 @@ import {
     FaUserEdit,
     FaWallet,
 } from "react-icons/fa";
+import Profile from "../views/members/Profile";
 import Signin from "../views/members/SignIn";
 import SignOut from "../views/members/SignOut";
 import SignUp from "../views/members/SignUp";
+import Wallet from "../views/members/Wallet";
 
 const AuthRoute = [
     {
@@ -39,14 +41,18 @@ const AuthRoute = [
         icon: <FaUserEdit />,
         path: "/profile",
         protected: true,
+        component: <Profile />,
         hidden: true,
+        member: true,
     },
     {
         name: "wallet",
         icon: <FaWallet />,
         path: "/wallet",
         protected: true,
+        component: <Wallet />,
         hidden: true,
+        member: true,
     },
 ];
 

@@ -22,11 +22,11 @@ import {
 } from "react-icons/fa";
 
 import { makeStyles } from "@material-ui/core/styles";
-import InputCustom from "../../components/customs/InputCustom";
+
 import { useMediaQuery } from "react-responsive";
 import AlertMsg from "../../components/customs/AlertMsg";
 import { Error, Info, Check } from "@mui/icons-material";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 
 import Logo from "../../assets/images/logo192.png";
 import CardLoading from "../../components/isLoading/CardLoading";
@@ -35,55 +35,17 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { useCookies } from "react-cookie";
 //API_Auth
 import AuthAPI from "../../apis/AuthApi";
-import actions from "../../store/actions/actionTypes";
+import * as actions from "../../store/actions";
 import { KeyCodeUtils } from "../../utils";
+import InputCustom from "../../components/customs/InputCustom";
 
-const useStyles = makeStyles((theme) => {
-    return {
-        wrapper: {
-            width: 400,
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginTop: "15%",
-            marginBottom: "auto",
+import signinstyle from "./styles/signinstyle";
 
-            padding: "3%",
-            border: "1px solid",
-            borderRadius: "5px",
-            boxShadow: "2px 2px",
-        },
-        wrapper_medium: {
-            width: 300,
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginTop: "40%",
-            marginBottom: "auto",
-
-            padding: "3%",
-            border: "1px solid",
-            borderRadius: "5px",
-            boxShadow: "2px 2px",
-        },
-        headerform: {
-            marginBottom: "10%",
-        },
-        title: {
-            marginLeft: "auto",
-            marginRight: "auto",
-        },
-        bottom_nav: {
-            marginTop: 20,
-        },
-        loading: {
-            marginTop: "10%",
-            padding: "10%",
-        },
-    };
-});
 const Signin = (props) => {
-    const classes = useStyles();
+    const classes = signinstyle();
     const history = useNavigate();
     const intl = useIntl();
+    const dispatch = useDispatch();
 
     // const { setUser } = userAuth();
     // const { user } = userAuth();
@@ -132,7 +94,6 @@ const Signin = (props) => {
         setShowpass(false);
     };
     const [typeInput, setTypeInput] = useState("password");
-    const { userLoginSuccess, userLoginFail } = props;
     const input = [
         {
             name: "username",
@@ -169,6 +130,11 @@ const Signin = (props) => {
     useEffect(() => {
         showpasswd ? setTypeInput("text") : setTypeInput("password");
         document.addEventListener("keydown", handlerKeyDown);
+        if (props.user) {
+            setUser(props.user);
+            console.log(user);
+            history("/");
+        }
         let timerAlert = setTimeout(() => {
             setAlert(null);
         }, 7000);
@@ -180,7 +146,7 @@ const Signin = (props) => {
             clearTimeout(timerAlert);
             clearTimeout(timerLoading);
         };
-    }, [showpasswd, formValues]);
+    }, [props.user, showpasswd, formValues]);
     const HandleAuth = async (e) => {
         if (e) {
             e.preventDefault();
@@ -213,7 +179,7 @@ const Signin = (props) => {
             setAlert(alert_show);
         }
         try {
-            let response = await AuthAPI.Login(formValues);
+            let response = await AuthAPI.SignIn(formValues);
             if (response.data.error) {
                 const alert_show = {
                     icon: <Error />,
@@ -259,18 +225,17 @@ const Signin = (props) => {
         user.token = response.data.access_token;
         let expires = new Date();
         expires.setTime(expires.getTime() + user.expires_in * 1000);
-        setCookie("access_token", user.token, {
-            path: "/",
-            expires,
-        });
-        setCookie("user", user, {
-            path: "/",
-            expires,
-        });
+        // setCookie("access_token", user.token, {
+        //     path: "/",
+        //     expires,
+        // });
+        // setCookie("user", user, {
+        //     path: "/",
+        //     expires,
+        // });
         setUser(user);
 
-        // userLoginSuccess(user);
-        console.log(userLoginSuccess);
+        props.userLoginSuccessRedux(user);
         setTimeout(() => {
             return history("/");
         }, 2000);
@@ -377,7 +342,11 @@ const Signin = (props) => {
                         </Grid>
                     </CardContent>
                     <CardActions>
-                        <Stack spacing={1} className={classes.bottom_nav}>
+                        <Stack
+                            spacing={1}
+                            direction="column"
+                            className={classes.bottom_nav}
+                        >
                             <Typography>
                                 <FormattedMessage id={"form.signin.ask"} />
                             </Typography>
@@ -410,13 +379,13 @@ const Signin = (props) => {
 };
 const mapStateToProps = (state) => {
     return {
-        user: state.userInfo,
-        language: state.app.language,
+        user: state.user.userInfo,
     };
 };
 const mapDispatchToProps = (dispatch) => {
     return {
-        userLoginSuccess: (user) => dispatch(actions.userLoginSuccess(user)),
+        userLoginSuccessRedux: (user) =>
+            dispatch(actions.userLoginSuccess(user)),
         userLoginFail: () => dispatch(actions.userLoginFail()),
     };
 };

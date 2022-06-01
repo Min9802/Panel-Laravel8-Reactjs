@@ -1,23 +1,22 @@
 import axios from "./index";
 
 class AuthApi {
-    static Login = (data) => {
+    static SignIn = (data) => {
         return axios.post(`${base}/login`, data);
     };
 
-    static Register = (data) => {
-        console.log(data);
+    static SignUp = (data) => {
         return axios.post(`${base}/register`, data);
     };
 
-    static Logout = (data) => {
+    static SignOut = (data) => {
         return axios.post(`${base}/logout`, data, {
-            headers: { Authorization: "Bearer" + `${data.access_token}` },
+            headers: { Authorization: "Bearer" + `${data.token}` },
         });
     };
     static Info = (data) => {
-        return axios.get(`${base}/login`, data, {
-            headers: { Authorization: "Bearer" + `${data.access_token}` },
+        return axios.post(`${base}/info`, data, {
+            headers: { Authorization: "Bearer" + `${data.token}` },
         });
     };
 }

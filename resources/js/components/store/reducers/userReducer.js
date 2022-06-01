@@ -1,7 +1,7 @@
 import actionTypes from "../actions/actionTypes";
 
 const initialState = {
-    isLoggedIn: false,
+    loggedUser: false,
     userInfo: null,
 };
 
@@ -10,20 +10,26 @@ const userReducer = (state = initialState, action) => {
         case actionTypes.USER_LOGIN_SUCCESS:
             return {
                 ...state,
-                isLoggedIn: true,
-                userInfo: action.user,
+                loggedUser: true,
+                userInfo: action.userInfo,
             };
         case actionTypes.USER_LOGIN_FAIL:
             return {
                 ...state,
-                isLoggedIn: false,
+                loggedUser: false,
                 userInfo: null,
             };
-        case actionTypes.PROCESS_LOGOUT:
+        case actionTypes.USER_SIGN_OUT:
             return {
                 ...state,
-                isLoggedIn: false,
+                loggedUser: "logout",
                 userInfo: null,
+            };
+        case actionTypes.USER_INFO:
+            return {
+                ...state,
+                loggedUser: true,
+                userInfo: action.userInfo,
             };
         default:
             return state;

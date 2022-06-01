@@ -9,28 +9,37 @@ import Toolbar from "@mui/material/Toolbar";
 
 import CssBaseline from "@mui/material/CssBaseline";
 
-import { Typography, MenuItem, Menu, Avatar } from "@mui/material";
+import { Typography, MenuItem, Menu, Avatar, Badge } from "@mui/material";
 
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import Drawers from "./patials/Drawers";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
     FaUserCircle,
     FaSignInAlt,
     FaSignOutAlt,
     FaUserEdit,
     FaWallet,
+    FaBell,
+    FaInbox,
 } from "react-icons/fa";
+import { FiMoreVertical } from "react-icons/fi";
 import { ListItemIcon, ListItemText } from "@material-ui/core";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { useCookies } from "react-cookie";
 import AuthRoute from "../../routes/AuthRoute";
+import MemberRoute from "../../routes/MemberRoute";
 import { FormattedMessage } from "react-intl";
 
 import EN from "../../assets/images/lang/EN.png";
 import VI from "../../assets/images/lang/VI.png";
+
+import { LANGUAGES } from "../../utils";
+
+import * as actions from "../../store/actions";
+
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -99,43 +108,70 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 //style
-const useStyles = makeStyles((theme) => ({
-    sidenav_navlink: {
-        textDecoration: "none",
-    },
-    textsidebar: {
-        fontWeight: "bold",
-        fontSize: "",
-        fontFamily: "Roboto",
-        textTransform: "uppercase",
-    },
-    authButton: {
-        position: "absolute",
-        right: 0,
-    },
-    urlAuth: {
-        textDecoration: "none",
-        color: "rgba(0, 0, 0, 0.87)",
-    },
-    UserName: {
-        fontWeight: "bold",
-        fontSize: "",
-        fontFamily: "Roboto",
-        textTransform: "uppercase",
-        paddingRight: 10,
-    },
-    lang: {
-        height: 28,
-        width: 28,
-        margin: "auto 5% auto auto",
-    },
-}));
+const useStyles = makeStyles((theme) => {
+    return {
+        sidenav_Link: {
+            textDecoration: "none",
+        },
+        textsidebar: {
+            fontWeight: "bold",
+            fontSize: "",
+            fontFamily: "Roboto",
+            textTransform: "uppercase",
+        },
+        authButton: {
+            position: "absolute",
+            right: 0,
+        },
+        urlAuth: {
+            textDecoration: "none",
+            color: "rgba(0, 0, 0, 0.87)",
+        },
+        UserName: {
+            fontWeight: "bold",
+            fontSize: "",
+            fontFamily: "Roboto",
+            textTransform: "uppercase",
+            paddingRight: 10,
+        },
+        lang: {
+            height: 28,
+            width: 28,
+            margin: "auto 5% auto auto",
+        },
+    };
+});
 const MiniDrawer = (props) => {
     const classes = useStyles();
     const theme = useTheme();
+    const [auth, setAuth] = useState(false);
+
+    ////
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [auth, setAuth] = useState(false);
+    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+
+    const isMenuOpen = Boolean(anchorEl);
+    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    const handleProfileMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMobileMenuClose = () => {
+        setMobileMoreAnchorEl(null);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        handleMobileMenuClose();
+    };
+
+    const handleMobileMenuOpen = (event) => {
+        setMobileMoreAnchorEl(event.currentTarget);
+    };
+
+    ///
     const { MIX_APP_NAME } = process.env;
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -148,21 +184,126 @@ const MiniDrawer = (props) => {
         setOpen(false);
     };
 
-    const handleMenu = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleChangeLang = () => {
+        props.language === "en"
+            ? props.changeLanguageAppRedux(LANGUAGES.VI)
+            : props.changeLanguageAppRedux(LANGUAGES.EN);
     };
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-    const handleChangeLang = () => {
-        console.log(props);
-    };
     useEffect(() => {
-        if (cookies.user) {
-            setAuth(cookies.user);
+        if (props.user) {
+            setAuth(props.user);
+        } else {
+            setAuth(false);
+            props.clearUserRedux();
         }
     });
+    const menuId = "primary-search-account-menu";
+    const renderMenu = (
+        <Menu
+            anchorEl={anchorEl}
+            anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+            }}
+            id={menuId}
+            keepMounted
+            transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+            }}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
+        >
+            {auth
+                ? AuthRoute.map((route, key) => {
+                      if (route.protected && route.hidden) {
+                          return (
+                              <MenuItem key={key}>
+                                  <ListItemIcon>{route.icon}</ListItemIcon>
+                                  <Link
+                                      to={route.path}
+                                      className={classes.urlAuth}
+                                  >
+                                      <ListItemText>
+                                          <FormattedMessage
+                                              id={"menu.member." + route.name}
+                                          />
+                                      </ListItemText>
+                                  </Link>
+                              </MenuItem>
+                          );
+                      }
+                  })
+                : AuthRoute.map((route, key) => {
+                      if (!route.protected) {
+                          return (
+                              <MenuItem key={key}>
+                                  <ListItemIcon>{route.icon}</ListItemIcon>
+                                  <Link
+                                      to={route.path}
+                                      className={classes.urlAuth}
+                                  >
+                                      <ListItemText>
+                                          <FormattedMessage
+                                              id={"menu.member." + [route.name]}
+                                          />
+                                      </ListItemText>
+                                  </Link>
+                              </MenuItem>
+                          );
+                      }
+                  })}
+        </Menu>
+    );
+    const mobileMenuId = "primary-search-account-menu-mobile";
+    const renderMobileMenu = (
+        <Menu
+            anchorEl={mobileMoreAnchorEl}
+            anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+            }}
+            id={mobileMenuId}
+            keepMounted
+            transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+            }}
+            open={isMobileMenuOpen}
+            onClose={handleMobileMenuClose}
+        >
+            <MenuItem>
+                <IconButton
+                    size="large"
+                    color="inherit"
+                    onClick={handleChangeLang}
+                >
+                    <Avatar
+                        src={props.language === "en" ? EN : VI}
+                        style={{ height: 28, width: 28 }}
+                    />
+                </IconButton>
+            </MenuItem>
+            <MenuItem onClick={handleProfileMenuOpen}>
+                <IconButton
+                    size="medium"
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    color="inherit"
+                >
+                    <FaUserCircle />
+                    {auth ? (
+                        <>{auth.name}</>
+                    ) : (
+                        <FormattedMessage id={"menu.header.account"} />
+                    )}
+                </IconButton>
+            </MenuItem>
+        </Menu>
+    );
+
     return (
         <Box sx={{ display: "flex" }}>
             <CssBaseline />
@@ -180,7 +321,7 @@ const MiniDrawer = (props) => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <NavLink to="/" className={classes.sidenav_navlink}>
+                    <Link to="/" className={classes.sidenav_Link}>
                         <Typography
                             className={classes.textsidebar}
                             variant="h6"
@@ -190,109 +331,68 @@ const MiniDrawer = (props) => {
                         >
                             {MIX_APP_NAME}
                         </Typography>
-                    </NavLink>
-                    <IconButton
-                        size="large"
-                        color="inherit"
-                        style={{
-                            position: "absolute",
-                            marginRight: 20,
-                            right: 50,
-                        }}
-                        onClick={handleChangeLang}
-                    >
-                        <Avatar src={EN} style={{ height: 28, width: 28 }} />
-                    </IconButton>
-                    <IconButton
-                        size="large"
-                        aria-label="account of current user"
-                        aria-controls="menu-appbar"
-                        aria-haspopup="true"
-                        onClick={handleMenu}
-                        color="inherit"
-                        style={{ position: "absolute", right: 20 }}
-                    >
-                        {auth ? (
-                            <Typography
-                                className={classes.UserName}
-                                variant="h6"
-                                noWrap
-                                color="white"
-                                component="div"
-                            >
-                                {auth.name}
-                            </Typography>
-                        ) : null}
-
-                        <FaUserCircle />
-                    </IconButton>
-                    <Menu
-                        id="menu-appbar"
-                        anchorEl={anchorEl}
-                        anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                        }}
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                    >
-                        {auth
-                            ? AuthRoute.map((route, key) => {
-                                  if (route.protected && route.hidden) {
-                                      return (
-                                          <MenuItem key={key}>
-                                              <ListItemIcon>
-                                                  {route.icon}
-                                              </ListItemIcon>
-                                              <NavLink
-                                                  to={route.path}
-                                                  className={classes.urlAuth}
-                                              >
-                                                  <ListItemText>
-                                                      <FormattedMessage
-                                                          id={
-                                                              "menu.member." +
-                                                              route.name
-                                                          }
-                                                      />
-                                                  </ListItemText>
-                                              </NavLink>
-                                          </MenuItem>
-                                      );
-                                  }
-                              })
-                            : AuthRoute.map((route, key) => {
-                                  if (!route.protected) {
-                                      return (
-                                          <MenuItem key={key}>
-                                              <ListItemIcon>
-                                                  {route.icon}
-                                              </ListItemIcon>
-                                              <NavLink
-                                                  to={route.path}
-                                                  className={classes.urlAuth}
-                                              >
-                                                  <ListItemText>
-                                                      <FormattedMessage
-                                                          id={
-                                                              "menu.member." +
-                                                              [route.name]
-                                                          }
-                                                      />
-                                                  </ListItemText>
-                                              </NavLink>
-                                          </MenuItem>
-                                      );
-                                  }
-                              })}
-                    </Menu>
+                    </Link>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                        <IconButton
+                            size="large"
+                            color="inherit"
+                            style={{
+                                position: "absolute",
+                                marginRight: 50,
+                                right: 80,
+                            }}
+                        >
+                            {auth ? (
+                                <Typography
+                                    className={classes.UserName}
+                                    variant="h6"
+                                    noWrap
+                                    color="white"
+                                    component="div"
+                                >
+                                    {auth.name}
+                                </Typography>
+                            ) : null}
+                        </IconButton>
+                        <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={handleChangeLang}
+                        >
+                            <Avatar
+                                src={props.language === "en" ? EN : VI}
+                                style={{ height: 28, width: 28 }}
+                            />
+                        </IconButton>
+                        <IconButton
+                            size="large"
+                            edge="end"
+                            aria-label="account of current user"
+                            aria-controls={menuId}
+                            aria-haspopup="true"
+                            onClick={handleProfileMenuOpen}
+                            color="inherit"
+                        >
+                            <FaUserCircle />
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ display: { xs: "flex", md: "none" } }}>
+                        <IconButton
+                            size="large"
+                            aria-label="show more"
+                            aria-controls={mobileMenuId}
+                            aria-haspopup="true"
+                            onClick={handleMobileMenuOpen}
+                            color="inherit"
+                        >
+                            <FiMoreVertical />
+                        </IconButton>
+                    </Box>
                 </Toolbar>
             </AppBar>
+            {renderMobileMenu}
+            {renderMenu}
             <Drawers
                 Drawer={Drawer}
                 DrawerHeader={DrawerHeader}
@@ -310,16 +410,15 @@ const MiniDrawer = (props) => {
 };
 const mapStateToProps = (state) => {
     return {
+        user: state.user.userInfo,
         language: state.app.language,
     };
 };
 const mapDispatchToProps = (dispatch) => {
     return {
-        storeUser: (user) =>
-            dispatch({
-                type: "INFO_USER",
-                payload: user,
-            }),
+        changeLanguageAppRedux: (language) =>
+            dispatch(actions.changeLanguageApp(language)),
+        clearUserRedux: () => dispatch(actions.userLoginFail()),
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(MiniDrawer);

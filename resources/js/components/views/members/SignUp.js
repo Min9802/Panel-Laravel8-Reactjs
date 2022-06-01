@@ -13,6 +13,8 @@ import {
     FaWarehouse,
     FaInbox,
 } from "react-icons/fa";
+import { AiOutlineGlobal, AiOutlineQrcode } from "react-icons/ai";
+import { MdExpandMore, MdMail } from "react-icons/md";
 import {
     Avatar,
     Button,
@@ -23,6 +25,7 @@ import {
 } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 import { Box, Container, Grid, Stack, Typography } from "@mui/material";
+import { Error, Info, Check } from "@mui/icons-material";
 
 import Logo from "../../assets/images/logo192.png";
 import CardLoading from "../../components/isLoading/CardLoading";
@@ -33,51 +36,13 @@ import InputCustom from "../../components/customs/InputCustom";
 import AuthAPI from "../../apis/AuthApi";
 import { FormattedMessage, useIntl } from "react-intl";
 import { KeyCodeUtils } from "../../utils";
+import AuthUserApi from "../../services/api/AuthUserApi";
+import * as actions from "../../store/actions";
 
-const useStyles = makeStyles((theme) => {
-    return {
-        wrapper: {
-            width: 400,
-            margin: "10% auto auto auto",
-            padding: "3%",
-            border: "1px solid",
-            borderRadius: "5px",
-            boxShadow: "2px 2px",
-        },
-        wrapper_medium: {
-            width: 300,
-            margin: "10% auto auto auto",
-
-            padding: "3%",
-            border: "1px solid",
-            borderRadius: "5px",
-            boxShadow: "2px 2px",
-        },
-        headerform: {
-            marginBottom: "10%",
-        },
-        title: {
-            marginLeft: "auto",
-            marginRight: "auto",
-        },
-        bottom_nav: {
-            marginTop: 20,
-        },
-        loading: {
-            marginTop: "10%",
-            padding: "10%",
-        },
-        error: {
-            color: "red",
-            border: "1px solid red",
-            borderRadius: "5px",
-            backgroundColor: "#f3f3f3",
-        },
-    };
-});
+import signupstyle from "./styles/signupstyle";
 
 const SignUp = (props) => {
-    const classes = useStyles();
+    const classes = signupstyle();
     const history = useNavigate();
     const intl = useIntl();
     //response
@@ -91,6 +56,7 @@ const SignUp = (props) => {
     const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
     //setState
     const [isLoading, setIsLoading] = useState(true);
+
     const [cookies, setCookie, removeCookie] = useCookies([
         "access_token",
         "user",
@@ -108,6 +74,7 @@ const SignUp = (props) => {
 
     const [alert, setAlert] = useState(false);
     const [error, setError] = useState(false);
+    const [user, setUser] = useState(false);
     const initValues = {
         username: "",
         name: "",
@@ -150,16 +117,37 @@ const SignUp = (props) => {
         e.preventDefault();
         validate();
         try {
-            let response = await AuthAPI.Register(formValues);
+            let response = await AuthAPI.SignUp(formValues);
+            return SignupSuccess(response);
         } catch (err) {
-            let errRes = err.response.data.message;
-            setFormErrs({
-                username: errRes.username,
-                name: errRes.name,
-                email: errRes.email,
-                password: errRes.password,
-            });
+            if (err.response) {
+                let errRes = err.response.data.message;
+                console.log(err);
+                setFormErrs({
+                    username: errRes.username,
+                    name: errRes.name,
+                    email: errRes.email,
+                    password: errRes.password,
+                });
+            }
         }
+    };
+    const SignupSuccess = async (response) => {
+        let message = response.data.message;
+        const alert_show = {
+            icon: <Check />,
+            alert: true,
+            severity: "success",
+            showAlert: true,
+            variant: "outlined",
+            title: "Success",
+            text: message,
+        };
+        setAlert(alert_show);
+        setTimeout(() => {
+            console.log(alert_show);
+            return history("/signin");
+        }, 2000);
     };
     const input = [
         {
@@ -196,7 +184,7 @@ const SignUp = (props) => {
             name: "email",
             type: "email",
             iconStart: (
-                <FaInbox
+                <MdMail
                     sx={{
                         color: "green",
                         fontSize: 20,
@@ -243,6 +231,11 @@ const SignUp = (props) => {
         // password !== "" && passwordConf !== "" ? checkPassConf() : null;
         showpasswd ? setTypeInput("text") : setTypeInput("password");
         document.addEventListener("keydown", handlerKeyDown);
+        if (props.user) {
+            setUser(props.user);
+            console.log(user);
+            history("/");
+        }
         let timerAlert = setTimeout(() => {
             setAlert(null);
         }, 7000);
@@ -254,7 +247,7 @@ const SignUp = (props) => {
             clearTimeout(timerAlert);
             clearTimeout(timerLoading);
         };
-    }, [showpasswd, formErrs]);
+    }, [props.user, showpasswd, formErrs]);
     return (
         <Container>
             {isLoading ? (
@@ -389,5 +382,15 @@ const SignUp = (props) => {
         </Container>
     );
 };
-
-export default SignUp;
+const mapStateToProps = (state) => {
+    return {
+        user: state.user.userInfo,
+    };
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+        userCreatedRedux: (user) => dispatch(actions.userLoginSuccess(user)),
+        userLoginFail: () => dispatch(actions.userLoginFail()),
+    };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

@@ -9,6 +9,7 @@
         "refresh": "Refresh",
         "accept": "Accept",
         "confirm": "Confirm",
+        "ok": "Ok",
         "confirm-this-task": "Are you sure to process this task?",
         "fail-to-load-data": "Fail to load data",
         "unknown-error": "There was an error",
@@ -28,6 +29,9 @@
         "userpass-wrong": "Invalid username or password!"
     },
     "menu": {
+        "header": {
+            "account": "Account"
+        },
         "guest": {
             "sidebar": {
                 "Home": "Home",
@@ -41,6 +45,40 @@
             "signout": "Sign out",
             "profile": "Profile",
             "wallet": "Wallet"
+        }
+    },
+    "user": {
+        "profile": {
+            "title": "Profile",
+            "account": "Account",
+            "bio": "Bio",
+            "url": "Link",
+            "createqr": "Generate QRcode",
+            "modelQR": "QRcode link Bio",
+            "tab": {
+                "info": "Info",
+                "editinfo": "Edit info",
+                "security": "Security"
+            }
+        }
+    },
+    "swal": {
+        "title": {
+            "error": "Error",
+            "success": "Success",
+            "warning": "Warning",
+            "info": "Info"
+        },
+        "fail": "Failed",
+        "success": "Successful",
+        "logout": {
+            "needsignin": "You need signin",
+            "ask": "Do you wan logout ?",
+            "success": "Sign out successful",
+            "fail": "Sign out failed!"
+        },
+        "user": {
+            "notfound": "User Not Found"
         }
     },
     "form": {
@@ -58,6 +96,13 @@
             "password": "Password",
             "password_confirmation": "Confirm Password",
             "ask": "You have already registered ?"
+        },
+        "edit": {
+            "username": "User Name",
+            "name": "Full Name",
+            "email": "Email Address",
+            "password": "Password",
+            "password_confirmation": "Confirm Password"
         },
         "placeholder": {
             "username": "Enter User Name",

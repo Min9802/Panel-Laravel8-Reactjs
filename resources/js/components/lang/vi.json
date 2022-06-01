@@ -9,6 +9,7 @@
         "refresh": "Refresh",
         "accept": "Chấp nhận",
         "confirm": "Xác nhận",
+        "ok": "Xác nhận",
         "confirm-this-task": "Bạn có chắc chắn thực hiện tác vụ này?",
         "fail-to-load-data": "Không thể tải về dữ liệu",
         "unknown-error": "Có lỗi xảy ra",
@@ -22,6 +23,9 @@
         "signup": "Đăng Ký"
     },
     "menu": {
+        "header": {
+            "account": "Tài Khoản"
+        },
         "guest": {
             "sidebar": {
                 "Home": "Trang Chủ",
@@ -37,6 +41,40 @@
             "wallet": "Ví"
         }
     },
+    "user":{
+        "profile": {
+            "title": "Hồ sơ",
+            "account": "Tài khoản",
+            "bio": "Tiểu sử",
+            "url": "Liên kết",
+            "createqr": "Tạo mã QR code",
+            "modelQR" : "Mã QR liên kết tiểu sử",
+            "tab": {
+                "info": "Thông tin",
+                "editinfo": "Chỉnh sửa thông tin",
+                "security": "Bảo mật"
+            }
+        }
+    },
+    "swal":{
+        "title": {
+            "error": "Lỗi",
+            "success": "Thành Công",
+            "warning": "Cảnh Báo",
+            "info": "Thông Tin"
+        },
+        "fail": "Thất bại",
+        "success": "Thành công",
+        "logout": {
+            "needsignin": "Bạn chưa đăng nhập",
+            "ask": "Bạn muốn đăng xuất ?",
+            "success":"Đã đăng xuất",
+            "fail": "Đăng xuất thất bại !"
+        },
+        "user":{
+            "notfound": "Không có tài khoản này"
+        }
+    },
     "form": {
         "signin": {
             "title": "Đăng nhập",
@@ -48,6 +86,7 @@
                 "password": "Nhập mật khẩu"
             }
         },
+
         "signup": {
             "title": "Đăng ký",
             "username": "Tên người dùng",
@@ -56,6 +95,13 @@
             "password": "Mật khẩu",
             "password_confirmation": "Xác nhận mật khẩu",
             "ask": "Bạn đã có tài khoản ?"
+        },
+        "edit": {
+            "username": "Tên người dùng",
+            "name": "Tên đầy đủ",
+            "email": "Địa chỉ email",
+            "password": "Mật khẩu",
+            "password_confirmation": "Xác nhận mật khẩu"
         },
         "placeholder": {
             "username": "Nhập tên người dùng",

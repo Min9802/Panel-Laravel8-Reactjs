@@ -21,7 +21,7 @@ isDevelopment = false;
 // });
 
 const reduxStateSyncConfig = {
-    whitelist: [actionTypes.APP_START_UP_COMPLETE],
+    whitelist: [actionTypes.APP_START_UP_COMPLETE, actionTypes.CHANGE_LANGUAGE],
 };
 
 const rootReducer = createRootReducer(history);
