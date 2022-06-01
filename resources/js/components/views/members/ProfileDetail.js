@@ -87,7 +87,6 @@ const ProfileDetail = (props) => {
         if (props.user) {
             UserDetail(props.user);
         }
-        // props.handle.setCardInfo(cardInfo);
     }, [props.user]);
     return (
         <Container>

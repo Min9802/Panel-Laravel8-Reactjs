@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'user'], function () {
 
     Route::post('/getuser', [
-        'as' => 'user.get',
+        'as' => 'user.getinfo',
         'uses' => 'AuthController@getuser',
     ]);
 });
