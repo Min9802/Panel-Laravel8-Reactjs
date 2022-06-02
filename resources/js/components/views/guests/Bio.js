@@ -41,14 +41,12 @@ const Bio = (props) => {
         text: "Welcome to Min!",
     };
     const cardInfo = {
-        title: intl.formatMessage({
-            id: "page.Bio",
-        }),
+        title: "Bio",
         avatar: null,
     };
     useEffect(() => {
         props.handle.setAlert(alert_show);
-        props.handle.setCardInfo(cardInfo);
+        // props.handle.setCardInfo(cardInfo);
         props.setInfoPageRedux(cardInfo);
         let timerAlert = setTimeout(() => {
             setIsLoading(false);

@@ -68,7 +68,10 @@
         "Home": "Home",
         "Contact": "Contact",
         "About": "About",
-        "Profile": "Profile"
+        "Profile": "Profile",
+        "ProfileDetail": "ProfileDetail",
+        "Signin": "Signin",
+        "Signup": "Signup"
     },
     "swal": {
         "title": {

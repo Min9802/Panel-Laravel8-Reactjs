@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { Typography } from "@mui/material";
 
 import { FaInfo } from "react-icons/fa";
-
+import { connect } from "react-redux";
+import * as actions from "../../store/actions";
 const Home = (props) => {
     const [isLoading, setIsLoading] = useState(true);
 
@@ -22,7 +23,7 @@ const Home = (props) => {
     useEffect(() => {
         props.handle.setAlert(alert_show);
         props.handle.setCardInfo(cardInfo);
-
+        props.setInfoPageRedux(cardInfo);
         let timerAlert = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
@@ -42,5 +43,13 @@ const Home = (props) => {
         </>
     );
 };
-
-export default Home;
+const mapStateToProps = (state) => {
+    return {};
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setInfoPageRedux: (infoPage) =>
+            dispatch(actions.appSetInfoPage(infoPage)),
+    };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

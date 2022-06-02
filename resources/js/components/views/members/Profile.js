@@ -99,9 +99,7 @@ const Profile = (props) => {
         }
     };
     const cardInfo = {
-        title: intl.formatMessage({
-            id: "page.Profile",
-        }),
+        title: "Profile",
         avatar: null,
     };
     const isDesktop = useMediaQuery({

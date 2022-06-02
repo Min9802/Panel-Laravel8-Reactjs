@@ -81,7 +81,10 @@
         "Home": "Trang Chủ",
         "Contact": "Liên Hệ",
         "About": "Giới Thiệu",
-        "Profile": "Hồ Sơ"
+        "Profile": "Hồ Sơ",
+        "ProfileDetail": "Tiểu Sử",
+        "Signin": "Đăng Nhập",
+        "Signup": "Đăng Ký"
     },
     "form": {
         "signin": {

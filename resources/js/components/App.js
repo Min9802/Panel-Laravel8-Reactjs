@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
-import GuestLayout from "./views/layouts/GuestLayout";
 import sideRoutes from "./routes/sideRoutes";
 import AuthRoute from "./routes/AuthRoute";
 import GlobalRoute from "./routes/GlobalRoute";
 import NotFound404 from "./views/NotFound404";
+import Layout from "./views/layouts/Layout";
 const App = () => {
     return (
         <Routes>
@@ -23,7 +23,7 @@ const App = () => {
                     exact
                     key={key}
                     path={route.path}
-                    element={<GuestLayout children={route.component} />}
+                    element={<Layout children={route.component} />}
                 />
             ))}
             {AuthRoute.map((route, key) => {
@@ -32,7 +32,7 @@ const App = () => {
                         exact
                         key={key}
                         path={route.path}
-                        element={<GuestLayout children={route.component} />}
+                        element={<Layout children={route.component} />}
                     />
                 ) : (
                     <Route

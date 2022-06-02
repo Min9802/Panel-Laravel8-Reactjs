@@ -9,7 +9,7 @@ import Toolbar from "@mui/material/Toolbar";
 
 import CssBaseline from "@mui/material/CssBaseline";
 
-import { Typography, MenuItem, Menu, Avatar, Badge } from "@mui/material";
+import { Typography, MenuItem, Menu, Avatar, Badge, Card } from "@mui/material";
 
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -26,12 +26,19 @@ import {
     FaInbox,
 } from "react-icons/fa";
 import { FiMoreVertical } from "react-icons/fi";
-import { ListItemIcon, ListItemText } from "@material-ui/core";
+import {
+    ListItemIcon,
+    ListItemText,
+    Container,
+    CardActions,
+    CardContent,
+    CardHeader,
+} from "@material-ui/core";
 import { connect } from "react-redux";
 import { useCookies } from "react-cookie";
 import AuthRoute from "../../routes/AuthRoute";
 import MemberRoute from "../../routes/MemberRoute";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import EN from "../../assets/images/lang/EN.png";
 import VI from "../../assets/images/lang/VI.png";
@@ -39,6 +46,10 @@ import VI from "../../assets/images/lang/VI.png";
 import { LANGUAGES } from "../../utils";
 
 import * as actions from "../../store/actions";
+import FixedBottomNavigation from "./footerNav";
+import { useMediaQuery } from "react-responsive";
+import AlertMsg from "../../components/customs/AlertMsg";
+import CardLoading from "../../components/isLoading/CardLoading";
 
 const drawerWidth = 240;
 
@@ -110,6 +121,17 @@ const Drawer = styled(MuiDrawer, {
 //style
 const useStyles = makeStyles((theme) => {
     return {
+        container_big: {
+            marginTop: "6%",
+            height: "100%",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "100%",
+            maxWidth: "100%",
+        },
+        container_medium: {
+            marginTop: "7%",
+            backgroundSize: "100%",
+        },
         sidenav_Link: {
             textDecoration: "none",
         },
@@ -141,10 +163,14 @@ const useStyles = makeStyles((theme) => {
         },
     };
 });
-const MiniDrawer = (props) => {
+const Layout = (props) => {
     const classes = useStyles();
     const theme = useTheme();
+    const intl = useIntl();
     const [auth, setAuth] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [alert, setAlert] = useState(false);
+    const [cardInfo, setCardInfo] = useState(false);
 
     ////
     const [open, setOpen] = useState(false);
@@ -157,7 +183,12 @@ const MiniDrawer = (props) => {
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
-
+    //responsive
+    const isDesktop = useMediaQuery({
+        query: "(min-width: 1224px)",
+    });
+    const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+    ///
     const handleMobileMenuClose = () => {
         setMobileMoreAnchorEl(null);
     };
@@ -191,13 +222,22 @@ const MiniDrawer = (props) => {
     };
 
     useEffect(() => {
+        if (props.pageInfo) {
+            setCardInfo(props.pageInfo);
+        }
         if (props.user) {
             setAuth(props.user);
         } else {
             setAuth(false);
             props.clearUserRedux();
         }
-    });
+        let timerLoading = setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+        return () => {
+            clearTimeout(timerLoading);
+        };
+    }, [props.pageInfo]);
     const menuId = "primary-search-account-menu";
     const renderMenu = (
         <Menu
@@ -303,7 +343,9 @@ const MiniDrawer = (props) => {
             </MenuItem>
         </Menu>
     );
-
+    const ChirenPages = React.cloneElement(props.children, {
+        handle: { setAlert, setCardInfo },
+    });
     return (
         <Box sx={{ display: "flex" }}>
             <CssBaseline />
@@ -403,7 +445,42 @@ const MiniDrawer = (props) => {
             />
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                 <DrawerHeader />
-                {props.Content}
+                {alert ? (
+                    <AlertMsg
+                        icon={alert.icon}
+                        alert={alert.alert}
+                        severity={alert.severity}
+                        showAlert={alert.showAlert}
+                        variant={alert.variant}
+                        title={alert.title}
+                        text={alert.text}
+                    />
+                ) : null}
+                <Container
+                    className={
+                        isDesktop
+                            ? classes.container_big
+                            : isTabletOrMobile
+                            ? classes.container_medium
+                            : classes.container
+                    }
+                >
+                    {isLoading && !cardInfo ? (
+                        <CardLoading />
+                    ) : (
+                        <Card>
+                            <CardHeader
+                                avatar={cardInfo.avatar}
+                                title={intl.formatMessage({
+                                    id: "page." + cardInfo.title,
+                                })}
+                            ></CardHeader>
+                            <CardContent>{ChirenPages}</CardContent>
+                            <CardActions>{cardInfo.actions}</CardActions>
+                        </Card>
+                    )}
+                </Container>
+                <FixedBottomNavigation />
             </Box>
         </Box>
     );
@@ -412,6 +489,7 @@ const mapStateToProps = (state) => {
     return {
         user: state.user.userInfo,
         language: state.app.language,
+        pageInfo: state.app.pageInfo,
     };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -421,4 +499,4 @@ const mapDispatchToProps = (dispatch) => {
         clearUserRedux: () => dispatch(actions.userLoginFail()),
     };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(MiniDrawer);
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);
