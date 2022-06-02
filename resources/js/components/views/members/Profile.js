@@ -27,6 +27,7 @@ import {
     ListItemIcon,
     ListItemText,
     Modal,
+    CircularProgress,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 
@@ -61,10 +62,12 @@ const Profile = (props) => {
     const [card, setCard] = useState(false);
     const [user, setUser] = useState(false);
     const [tab, setTab] = useState("1");
+    const [callAPI, setCallAPI] = useState(false);
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const BtnUpdate = <FormattedMessage id={"common.update"} />;
 
     const UserDetail = async (user) => {
         try {
@@ -97,7 +100,7 @@ const Profile = (props) => {
     };
     const cardInfo = {
         title: intl.formatMessage({
-            id: "user.profile.title",
+            id: "page.Profile",
         }),
         avatar: null,
     };
@@ -116,7 +119,7 @@ const Profile = (props) => {
         email: "",
     });
 
-    const currentRoute = window.location.href;
+    const { MIX_APP_BASE_URL } = process.env;
     const handleChange = (event, newValue) => {
         setTab(newValue);
     };
@@ -134,6 +137,7 @@ const Profile = (props) => {
         setValues({ ...values, [name]: value });
     };
     const handleUpdate = async (e) => {
+        setCallAPI(true);
         e.preventDefault();
         let responseUpdate = await AuthApi.UpdateInfo(values);
         if (responseUpdate.status === 200) {
@@ -143,13 +147,16 @@ const Profile = (props) => {
                 user.access_token = refresh.data.access_token;
                 props.userLoginSuccessRedux(user);
                 setRenderer(false);
+                setCallAPI(false);
             } else {
                 props.clearUserRedux();
                 setRenderer(false);
+                setCallAPI(false);
             }
         } else {
             props.clearUserRedux();
             setRenderer(false);
+            setCallAPI(false);
         }
     };
     useEffect(() => {
@@ -249,7 +256,7 @@ const Profile = (props) => {
                                     </ListItemIcon>
                                     <ListItemText>
                                         <Button>
-                                            {currentRoute +
+                                            {MIX_APP_BASE_URL +
                                                 "/@" +
                                                 user.username}
                                         </Button>
@@ -340,14 +347,26 @@ const Profile = (props) => {
                                         onChange(e);
                                     }}
                                 />
-                                <Button
-                                    type="submit"
-                                    className={`fadeIn fourth`}
-                                    startIcon={<GrUpdate />}
-                                    onClick={(e) => handleUpdate(e)}
-                                >
-                                    <FormattedMessage id={"common.update"} />
-                                </Button>
+                                {callAPI ? (
+                                    <Button
+                                        type="submit"
+                                        variant="outlined"
+                                        disabled
+                                        className={`fadeIn fourth`}
+                                    >
+                                        <CircularProgress />
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        type="submit"
+                                        variant="outlined"
+                                        className={`fadeIn fourth`}
+                                        startIcon={<GrUpdate />}
+                                        onClick={(e) => handleUpdate(e)}
+                                    >
+                                        {BtnUpdate}
+                                    </Button>
+                                )}
                             </Stack>
                         </Grid>
                     </Grid>
@@ -378,7 +397,7 @@ const Profile = (props) => {
                         </Typography>
                         <Box>
                             <QRGenerate
-                                value={currentRoute + "/@" + user.username}
+                                value={MIX_APP_BASE_URL + "/@" + user.username}
                             />
                         </Box>
                     </Stack>

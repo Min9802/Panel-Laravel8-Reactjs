@@ -7,7 +7,7 @@ const GlobalRoute = [
     {
         name: "profile",
         icon: <FaUserEdit />,
-        path: "/profile",
+        path: "",
         protected: true,
         component: <ProfileDetail />,
         hidden: true,

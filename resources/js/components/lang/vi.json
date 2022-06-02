@@ -42,14 +42,14 @@
             "wallet": "Ví"
         }
     },
-    "user":{
+    "user": {
         "profile": {
             "title": "Hồ sơ",
             "account": "Tài khoản",
             "bio": "Tiểu sử",
             "url": "Liên kết",
             "createqr": "Tạo mã QR code",
-            "modelQR" : "Mã QR liên kết tiểu sử",
+            "modelQR": "Mã QR liên kết tiểu sử",
             "tab": {
                 "info": "Thông tin",
                 "editinfo": "Chỉnh sửa thông tin",
@@ -57,7 +57,7 @@
             }
         }
     },
-    "swal":{
+    "swal": {
         "title": {
             "error": "Lỗi",
             "success": "Thành Công",
@@ -69,12 +69,19 @@
         "logout": {
             "needsignin": "Bạn chưa đăng nhập",
             "ask": "Bạn muốn đăng xuất ?",
-            "success":"Đã đăng xuất",
+            "success": "Đã đăng xuất",
             "fail": "Đăng xuất thất bại !"
         },
-        "user":{
+        "user": {
             "notfound": "Không có tài khoản này"
         }
+    },
+    "page": {
+        "Bio": "Tiểu sử",
+        "Home": "Trang Chủ",
+        "Contact": "Liên Hệ",
+        "About": "Giới Thiệu",
+        "Profile": "Hồ Sơ"
     },
     "form": {
         "signin": {

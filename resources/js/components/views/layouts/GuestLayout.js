@@ -40,6 +40,7 @@ const GuestLayout = (props) => {
     const [isLoading, setIsLoading] = useState(true);
     const [alert, setAlert] = useState(false);
     const [cardInfo, setCardInfo] = useState(false);
+    const [PageInfo, setPageInfo] = useState(false);
     // response
     const isDesktop = useMediaQuery({
         query: "(min-width: 1224px)",
@@ -57,7 +58,6 @@ const GuestLayout = (props) => {
         let timerLoading = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
-        console.log(cardInfo);
         return () => {
             clearTimeout(timerLoading);
         };

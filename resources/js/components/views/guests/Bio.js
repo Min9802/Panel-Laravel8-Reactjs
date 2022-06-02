@@ -8,6 +8,7 @@ import { FaInfo } from "react-icons/fa";
 import { useCookies } from "react-cookie";
 import { connect } from "react-redux";
 import * as actions from "../../store/actions";
+import { FormattedMessage, useIntl } from "react-intl";
 
 const useStyles = makeStyles((theme) => {
     return {
@@ -21,6 +22,7 @@ const useStyles = makeStyles((theme) => {
 
 const Bio = (props) => {
     const classes = useStyles();
+    const intl = useIntl();
 
     const [isLoading, setIsLoading] = useState(true);
     const [Alert, setUpdateAlert] = useState(false);
@@ -39,12 +41,14 @@ const Bio = (props) => {
         text: "Welcome to Min!",
     };
     const cardInfo = {
-        title: "Bio",
+        title: intl.formatMessage({
+            id: "page.Bio",
+        }),
         avatar: null,
     };
     useEffect(() => {
         props.handle.setAlert(alert_show);
-        // props.handle.setCardInfo(cardInfo);
+        props.handle.setCardInfo(cardInfo);
         props.setInfoPageRedux(cardInfo);
         let timerAlert = setTimeout(() => {
             setIsLoading(false);

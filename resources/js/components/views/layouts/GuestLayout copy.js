@@ -16,6 +16,7 @@ import MiniDrawer from "./MiniDrawer";
 import AlertMsg from "../../components/customs/AlertMsg";
 import CardLoading from "../../components/isLoading/CardLoading";
 import { withCookies, useCookies } from "react-cookie";
+import { FormattedMessage, useIntl } from "react-intl";
 
 const useStyles = makeStyles((theme) => {
     return {
@@ -35,9 +36,11 @@ const useStyles = makeStyles((theme) => {
 
 const GuestLayout = (props) => {
     const classes = useStyles();
+    const intl = useIntl();
     const [isLoading, setIsLoading] = useState(true);
     const [alert, setAlert] = useState(false);
     const [cardInfo, setCardInfo] = useState(false);
+    const [PageInfo, setPageInfo] = useState(false);
     // response
     const isDesktop = useMediaQuery({
         query: "(min-width: 1224px)",
@@ -52,10 +55,13 @@ const GuestLayout = (props) => {
     });
 
     useEffect(() => {
-        setTimeout(() => {
+        let timerLoading = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
-    });
+        return () => {
+            clearTimeout(timerLoading);
+        };
+    }, [cardInfo]);
     return (
         <MiniDrawer
             Content={
@@ -80,7 +86,7 @@ const GuestLayout = (props) => {
                                 : classes.container
                         }
                     >
-                        {isLoading ? (
+                        {isLoading && !cardInfo ? (
                             <CardLoading />
                         ) : (
                             <Card>

@@ -63,6 +63,13 @@
             }
         }
     },
+    "page": {
+        "Bio": "Bio",
+        "Home": "Home",
+        "Contact": "Contact",
+        "About": "About",
+        "Profile": "Profile"
+    },
     "swal": {
         "title": {
             "error": "Error",
