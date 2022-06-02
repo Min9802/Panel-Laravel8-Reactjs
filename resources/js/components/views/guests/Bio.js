@@ -6,6 +6,8 @@ import ButtonBio from "../../components/customs/ButtonBio";
 
 import { FaInfo } from "react-icons/fa";
 import { useCookies } from "react-cookie";
+import { connect } from "react-redux";
+import * as actions from "../../store/actions";
 
 const useStyles = makeStyles((theme) => {
     return {
@@ -42,14 +44,14 @@ const Bio = (props) => {
     };
     useEffect(() => {
         props.handle.setAlert(alert_show);
-        props.handle.setCardInfo(cardInfo);
-
+        // props.handle.setCardInfo(cardInfo);
+        props.setInfoPageRedux(cardInfo);
         let timerAlert = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
         let timerLoading = setTimeout(() => {
             props.handle.setAlert(false);
-        }, 7000);
+        }, 1000);
         return () => {
             clearTimeout(timerAlert);
             clearTimeout(timerLoading);
@@ -64,5 +66,13 @@ const Bio = (props) => {
         />
     );
 };
-
-export default Bio;
+const mapStateToProps = (state) => {
+    return {};
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setInfoPageRedux: (infoPage) =>
+            dispatch(actions.appSetInfoPage(infoPage)),
+    };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Bio);

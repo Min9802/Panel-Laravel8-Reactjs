@@ -37,6 +37,7 @@ import {
     AiOutlineMail,
 } from "react-icons/ai";
 import { MdExpandMore, MdMail } from "react-icons/md";
+import { GrUpdate } from "react-icons/gr";
 import { makeStyles } from "@material-ui/core/styles";
 
 import Logo from "../../assets/images/logo512.png";
@@ -48,6 +49,7 @@ import { List } from "@material-ui/core";
 import QRCode from "react-qr-code";
 import { useMediaQuery } from "react-responsive";
 import InputCustom from "../../components/customs/InputCustom";
+import * as actions from "../../store/actions";
 
 const Profile = (props) => {
     const classes = profilestyle();
@@ -85,8 +87,10 @@ const Profile = (props) => {
             }).then((result) => {
                 if (result.isConfirmed) {
                     history("/signin");
+                    props.userLoginFail();
                 } else {
                     history("/signin");
+                    props.userLoginFail();
                 }
             });
         }
@@ -106,6 +110,12 @@ const Profile = (props) => {
     const isTablet = useMediaQuery({ query: "(min-width: 768px)" });
     const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
 
+    const [values, setValues] = useState({
+        username: "",
+        name: "",
+        email: "",
+    });
+
     const currentRoute = window.location.href;
     const handleChange = (event, newValue) => {
         setTab(newValue);
@@ -116,12 +126,43 @@ const Profile = (props) => {
     const QRGenerate = (value) => {
         return <QRCode value={value.value} bgColor="#FFFFFF" level="H" />;
     };
+    const [rerender, setRenderer] = useState(false);
+
+    const onChange = (e) => {
+        e.preventDefault();
+        const { name, value } = e.target;
+        setValues({ ...values, [name]: value });
+    };
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        let responseUpdate = await AuthApi.UpdateInfo(values);
+        if (responseUpdate.status === 200) {
+            let refresh = await AuthApi.Refresh(props.user);
+            if (refresh.status === 200) {
+                let user = { ...refresh.data.user };
+                user.access_token = refresh.data.access_token;
+                props.userLoginSuccessRedux(user);
+                setRenderer(false);
+            } else {
+                props.clearUserRedux();
+                setRenderer(false);
+            }
+        } else {
+            props.clearUserRedux();
+            setRenderer(false);
+        }
+    };
     useEffect(() => {
         if (props.user) {
             UserDetail(props.user);
         }
+        if (!rerender && props.user) {
+            setValues(props.user);
+            setRenderer(true);
+        }
+
         props.handle.setCardInfo(cardInfo);
-    }, [props.user]);
+    }, [props.user, values]);
     return (
         <Box sx={{ width: "100%", typography: "body1" }}>
             <TabContext value={tab}>
@@ -233,16 +274,17 @@ const Profile = (props) => {
                     </Accordion>
                     {/* end Bio */}
                 </TabPanel>
+                {/* edit profile */}
                 <TabPanel value="2">
                     <Grid container spacing={3}>
                         <Grid item md={4}>
-                            <Stack spacing={2} className={`fadeIn first`}>
+                            <Stack spacing={2}>
                                 <InputCustom
                                     name={"username"}
                                     type={"text"}
                                     disabled
-                                    className={`fadeIn`}
-                                    value={user ? user.username : ""}
+                                    className={`fadeIn first`}
+                                    value={values.username}
                                     label={
                                         <FormattedMessage
                                             id={"form.edit.username"}
@@ -254,22 +296,15 @@ const Profile = (props) => {
                                     iconStart={<FaUserCircle />}
                                     iconEnd={""}
                                     handleFunc={""}
-                                    onChange={() => {}}
+                                    onChange={(e) => {
+                                        onChange(e);
+                                    }}
                                 />
-                                {/* {formErrs[input.name] ? (
-                                    <Typography className={classes.error}>
-                                        {formErrs[input.name]}
-                                    </Typography>
-                                ) : null} */}
-                            </Stack>
-                        </Grid>
-                        <Grid item md={4}>
-                            <Stack spacing={2} className={`fadeIn first`}>
                                 <InputCustom
                                     name={"name"}
                                     type={"text"}
-                                    className={`fadeIn`}
-                                    value={user ? user.username : ""}
+                                    className={`fadeIn second`}
+                                    value={values.name}
                                     label={
                                         <FormattedMessage
                                             id={"form.edit.name"}
@@ -281,22 +316,15 @@ const Profile = (props) => {
                                     iconStart={<FaUserCircle />}
                                     iconEnd={""}
                                     handleFunc={""}
-                                    onChange={() => {}}
+                                    onChange={(e) => {
+                                        onChange(e);
+                                    }}
                                 />
-                                {/* {formErrs[input.name] ? (
-                                    <Typography className={classes.error}>
-                                        {formErrs[input.name]}
-                                    </Typography>
-                                ) : null} */}
-                            </Stack>
-                        </Grid>
-                        <Grid item md={4}>
-                            <Stack spacing={2} className={`fadeIn first`}>
                                 <InputCustom
-                                    name={"name"}
+                                    name={"email"}
                                     type={"text"}
-                                    className={`fadeIn`}
-                                    value={user ? user.email : ""}
+                                    className={`fadeIn third`}
+                                    value={values.email}
                                     label={
                                         <FormattedMessage
                                             id={"form.edit.email"}
@@ -308,19 +336,28 @@ const Profile = (props) => {
                                     iconStart={<AiOutlineMail />}
                                     iconEnd={""}
                                     handleFunc={""}
-                                    onChange={() => {}}
+                                    onChange={(e) => {
+                                        onChange(e);
+                                    }}
                                 />
-                                {/* {formErrs[input.name] ? (
-                                    <Typography className={classes.error}>
-                                        {formErrs[input.name]}
-                                    </Typography>
-                                ) : null} */}
+                                <Button
+                                    type="submit"
+                                    className={`fadeIn fourth`}
+                                    startIcon={<GrUpdate />}
+                                    onClick={(e) => handleUpdate(e)}
+                                >
+                                    <FormattedMessage id={"common.update"} />
+                                </Button>
                             </Stack>
                         </Grid>
                     </Grid>
                 </TabPanel>
-                <TabPanel value="3">Item Three</TabPanel>
+                {/* end edit profile */}
+                <TabPanel value="3">
+                    <FormattedMessage id={"user.profile.tab.security"} />
+                </TabPanel>
             </TabContext>
+            {/* Modal QR */}
             <Modal open={open} onClose={handleClose}>
                 <Box
                     className={
@@ -347,6 +384,7 @@ const Profile = (props) => {
                     </Stack>
                 </Box>
             </Modal>
+            {/* End Modal QR */}
         </Box>
     );
 };
@@ -359,6 +397,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         userLoginFail: () => dispatch(actions.userLoginFail()),
         clearUserRedux: () => dispatch(actions.userLoginFail()),
+        userLoginSuccessRedux: (user) =>
+            dispatch(actions.userLoginSuccess(user)),
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

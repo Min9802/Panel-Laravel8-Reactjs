@@ -151,7 +151,7 @@ const Signin = (props) => {
         if (e) {
             e.preventDefault();
         }
-        if (user && user.token) {
+        if (user && user.access_token) {
             return history("/");
         }
         if (formValues.username === "") {
@@ -222,7 +222,7 @@ const Signin = (props) => {
     };
     const setProfile = async (response) => {
         let user = { ...response.data.user };
-        user.token = response.data.access_token;
+        user.access_token = response.data.access_token;
         let expires = new Date();
         expires.setTime(expires.getTime() + user.expires_in * 1000);
         // setCookie("access_token", user.token, {

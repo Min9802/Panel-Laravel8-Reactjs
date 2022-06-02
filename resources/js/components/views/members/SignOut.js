@@ -73,8 +73,10 @@ const SignOut = (props) => {
                     }),
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        props.clearUserRedux();
                         history("/");
                     } else {
+                        props.clearUserRedux();
                         history("/");
                     }
                 });

@@ -11,6 +11,7 @@ const initialState = {
     started: true,
     language: "vi",
     systemMenuPath: "/system/user-manage",
+    pageInfo: null,
     contentOfConfirmModal: {
         ...initContentOfConfirmModal,
     },
@@ -35,6 +36,11 @@ const appReducer = (state = initialState, action) => {
             return {
                 ...state,
                 language: action.language,
+            };
+        case actionTypes.SET_INFO_PAGE:
+            return {
+                ...state,
+                pageInfo: action.pageInfo,
             };
         default:
             return state;

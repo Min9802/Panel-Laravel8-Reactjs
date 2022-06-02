@@ -11,13 +11,21 @@ class AuthApi {
 
     static SignOut = (data) => {
         return axios.post(`${base}/logout`, data, {
-            headers: { Authorization: "Bearer" + `${data.token}` },
+            headers: { Authorization: "Bearer" + `${data.access_token}` },
         });
     };
     static Info = (data) => {
         return axios.post(`${base}/info`, data, {
-            headers: { Authorization: "Bearer" + `${data.token}` },
+            headers: { Authorization: "Bearer" + `${data.access_token}` },
         });
+    };
+    static Refresh = (data) => {
+        return axios.post(`${base}/refresh`, data, {
+            headers: { Authorization: "Bearer" + `${data.access_token}` },
+        });
+    };
+    static UpdateInfo = (data) => {
+        return axios.post(`${base}/update`, data);
     };
 }
 

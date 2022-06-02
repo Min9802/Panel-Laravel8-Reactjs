@@ -16,6 +16,7 @@ import MiniDrawer from "./MiniDrawer";
 import AlertMsg from "../../components/customs/AlertMsg";
 import CardLoading from "../../components/isLoading/CardLoading";
 import { withCookies, useCookies } from "react-cookie";
+import { FormattedMessage, useIntl } from "react-intl";
 
 const useStyles = makeStyles((theme) => {
     return {
@@ -32,11 +33,10 @@ const useStyles = makeStyles((theme) => {
         },
     };
 });
-const ContentPages = (props) => {
-    return <Box></Box>;
-};
+
 const GuestLayout = (props) => {
     const classes = useStyles();
+    const intl = useIntl();
     const [isLoading, setIsLoading] = useState(true);
     const [alert, setAlert] = useState(false);
     const [cardInfo, setCardInfo] = useState(false);
@@ -54,10 +54,14 @@ const GuestLayout = (props) => {
     });
 
     useEffect(() => {
-        setTimeout(() => {
+        let timerLoading = setTimeout(() => {
             setIsLoading(false);
         }, 1000);
-    });
+        console.log(cardInfo);
+        return () => {
+            clearTimeout(timerLoading);
+        };
+    }, [cardInfo]);
     return (
         <MiniDrawer
             Content={
@@ -82,7 +86,7 @@ const GuestLayout = (props) => {
                                 : classes.container
                         }
                     >
-                        {isLoading ? (
+                        {isLoading && !cardInfo ? (
                             <CardLoading />
                         ) : (
                             <Card>

@@ -20,7 +20,7 @@ class AuthController extends Controller
     public function __construct(User $user)
     {
         $this->user = $user;
-        $this->middleware('auth:api', ['except' => ['login', 'register','getuser']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'getuser','update']]);
     }
 
     /**
@@ -110,7 +110,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 12*60,
+            'expires_in' => auth()->factory()->getTTL() * 12 * 60,
             'user' => auth()->user(),
         ]);
     }
@@ -139,20 +139,40 @@ class AuthController extends Controller
     public function getuser(Request $request)
     {
         $username = $request->username;
-        $user = $this->user->where('username',$username)->first();
-        if($user){
+        $user = $this->user->where('username', $username)->first();
+        if ($user) {
             $dataUser = [
                 'username' => $user->username,
                 'name' => $user->name,
-                'email' => $user->email
+                'email' => $user->email,
             ];
             return response()->json($dataUser);
-        }else{
+        } else {
             $data = [
                 'message' => "User Not Found",
             ];
-            return response()->json($data,403);
+            return response()->json($data, 403);
 
         }
+    }
+    public function update(Request $request)
+    {
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+        ];
+        $user = $this->user->find($request->id);
+        if ($user) {
+            $userupdate = $this->user->find($request->id)->update($data);
+            $userinfo = $this->user->find($request->id);
+            return response()->json($userinfo);
+        } else {
+            $data = [
+                'message' => "User Not Found",
+            ];
+            return response()->json($data, 403);
+
+        }
+
     }
 }

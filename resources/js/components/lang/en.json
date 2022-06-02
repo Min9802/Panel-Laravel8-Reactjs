@@ -9,6 +9,7 @@
         "refresh": "Refresh",
         "accept": "Accept",
         "confirm": "Confirm",
+        "update": "Update",
         "ok": "Ok",
         "confirm-this-task": "Are you sure to process this task?",
         "fail-to-load-data": "Fail to load data",

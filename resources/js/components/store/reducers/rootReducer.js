@@ -22,7 +22,7 @@ const adminPersistConfig = {
 const appPersistConfig = {
     ...persistCommonConfig,
     key: "app",
-    whitelist: ["language"],
+    whitelist: ["language", "pageInfo"],
 };
 const userPersistConfig = {
     ...persistCommonConfig,

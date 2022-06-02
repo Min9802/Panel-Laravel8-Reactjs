@@ -12,3 +12,7 @@ export const changeLanguageApp = (languagechange) => ({
     type: actionTypes.CHANGE_LANGUAGE,
     language: languagechange,
 });
+export const appSetInfoPage = (pageInfo) => ({
+    type: actionTypes.SET_INFO_PAGE,
+    pageInfo: pageInfo,
+});

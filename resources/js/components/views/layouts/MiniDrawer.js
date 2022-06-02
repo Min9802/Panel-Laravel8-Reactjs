@@ -27,7 +27,7 @@ import {
 } from "react-icons/fa";
 import { FiMoreVertical } from "react-icons/fi";
 import { ListItemIcon, ListItemText } from "@material-ui/core";
-import { connect, useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { useCookies } from "react-cookie";
 import AuthRoute from "../../routes/AuthRoute";
 import MemberRoute from "../../routes/MemberRoute";
